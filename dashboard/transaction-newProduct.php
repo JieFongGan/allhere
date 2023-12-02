@@ -1,6 +1,6 @@
 <?php
-ob_start(); // Start output buffering
 session_start();
+ob_start(); // Start output buffering
 
 // Include header and database connection
 $pageTitle = "Transactions/New-product";

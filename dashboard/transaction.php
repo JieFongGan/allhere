@@ -30,7 +30,7 @@ $offset = ($current_page - 1) * $itemsPerPage;
 $subsetTransactions = array_slice($transactions, $offset, $itemsPerPage);
 
 if (isset($_POST['Cnew'])) {
-    header("Location: inventory-new.php");
+    header("Location: transaction-new.php");
     exit;
 }
 

@@ -1,7 +1,6 @@
 <?php
-ob_start(); // Start output buffering
 session_start(); // Start the session
-
+ob_start(); // Start output buffering
 $pageTitle = "Transaction/New";
 include '../database/database-connect.php';
 include '../contain/header.php';
