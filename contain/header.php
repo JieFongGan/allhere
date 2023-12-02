@@ -31,46 +31,46 @@
         <div class="sidebar-menu">
             <ul>
                 <li>
-                    <a href="../layout/homepage.php">
+                    <a href="../dashboard/homepage.php">
                         <span class="ti-home"></span>
                         <span>Home</span>
                     </a>
                 </li>
                 <li>
-                    <a href="../layout/inventory.php">
+                    <a href="../dashboard/inventory.php">
                         <span class="ti-package"></span>
                         <span>Inventory</span>
                     </a>
                 </li>
                 <li>
-                    <a href="../layout/transaction.php">
+                    <a href="../dashboard/transaction.php">
                         <span class="ti-shopping-cart"></span>
                         <span>Transaction</span>
                     </a>
                 </li>
                 <li>
-                    <a href="../layout/warehouse.php">
+                    <a href="../dashboard/warehouse.php">
                         <span class="ti-truck"></span>
                         <span>Warehouse</span>
                     </a>
                 </li>
                 <?php if ($userrole !== 'User'): ?>
                     <li>
-                        <a href="../layout/customer.php">
+                        <a href="../dashboard/customer.php">
                             <span class="ti-agenda"></span>
                             <span>Customer</span>
                         </a>
                     </li>
                 <?php endif; ?>
                 <li>
-                    <a href="../layout/report.php">
+                    <a href="../dashboard/report.php">
                         <span class="ti-pie-chart"></span>
                         <span>Report</span>
                     </a>
                 </li>
                 <?php if ($userrole !== 'User'): ?>
                     <li>
-                        <a href="../layout/settings.php">
+                        <a href="../dashboard/settings.php">
                             <span class="ti-settings"></span>
                             <span>Setting</span>
                         </a>

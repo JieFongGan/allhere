@@ -53,7 +53,7 @@ if ($latestTransactionsQuery !== false) {
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="../layout/inventory.php">View all</a>
+                    <a href="../dashboard/inventory.php">View all</a>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@ if ($latestTransactionsQuery !== false) {
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="../layout/transaction.php">View all</a>
+                    <a href="../dashboard/transaction.php">View all</a>
                 </div>
             </div>
 
@@ -83,7 +83,7 @@ if ($latestTransactionsQuery !== false) {
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="../layout/transaction.php">View all</a>
+                    <a href="../dashboard/transaction.php">View all</a>
                 </div>
             </div>
         </div>
