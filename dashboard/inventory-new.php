@@ -4,7 +4,16 @@ $pageTitle = "Inventory/Create";
 include '../database/database-connect.php';
 include '../contain/header.php';
 
-$errors = [];
+// Set default values for a new product
+$productData = array(
+    'ProductID' => '',
+    'Name' => '',
+    'CategoryID' => '',
+    'WarehouseID' => '',
+    'Description' => '',
+    'Price' => '',
+    'Quantity' => ''
+);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
@@ -15,53 +24,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = $_POST['productPrice'];
     $quantity = $_POST['productQuantity'];
 
-    // Additional validation checks
-    if (empty($productName)) {
-        $errors[] = "Product name is required.";
-    }
+    // Insert new product into the database
+    $insertSql = "INSERT INTO Product (Name, CategoryID, WarehouseID, Description, Price, Quantity, LastUpdatedDate)
+                  VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
+    $insertStmt = $conn->prepare($insertSql);
+    $insertStmt->execute([$productName, $categoryID, $warehouseID, $description, $price, $quantity]);
 
-    if (empty($categoryID)) {
-        $errors[] = "Category is required.";
-    }
-
-    if (empty($description)) {
-        $errors[] = "Description is required.";
-    }
-
-    if (!is_numeric($price) || $price <= 0) {
-        $errors[] = "Price must be a valid positive number.";
-    }
-
-    // If there are validation errors, display them and stop further processing
-    if (!empty($errors)) {
-        foreach ($errors as $error) {
-            echo "<p class='error'>$error</p>";
-        }
+    // Check if the insert was successful
+    if ($insertStmt->rowCount() > 0) {
+        echo "Product created successfully.";
+        header("Location: inventory.php");
+        exit();
     } else {
-        try {
-            // Insert the new product into the database using PDO
-            $insertSql = "INSERT INTO Product (Name, CategoryID, WarehouseID, Description, Price, Quantity, LastUpdatedDate) 
-                          VALUES (:productName, :categoryID, :warehouseID, :description, :price, :quantity, NOW())";
-            $insertStmt = $conn->prepare($insertSql);
-            $insertStmt->bindParam(':productName', $productName);
-            $insertStmt->bindParam(':categoryID', $categoryID);
-            $insertStmt->bindParam(':warehouseID', $warehouseID);
-            $insertStmt->bindParam(':description', $description);
-            $insertStmt->bindParam(':price', $price);
-            $insertStmt->bindParam(':quantity', $quantity);
-            $insertStmt->execute();
-
-            // Check if the insertion was successful
-            if ($insertStmt->rowCount() > 0) {
-                echo "Product created successfully.";
-                header("Location: inventory.php");
-                exit();
-            } else {
-                echo "Error creating product.";
-            }
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
+        echo "Error creating product.";
     }
 }
 
@@ -77,30 +52,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-container">
             <form action="" method="post">
                 <div class="form-group">
-                    <?php
-                    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($errors)) {
-                        echo '<div class="error-container">';
-                        echo '<p class="error">Please fix the following errors:</p>';
-                        echo '<ul>';
-                        foreach ($errors as $error) {
-                            echo '<li>' . htmlspecialchars($error) . '</li>';
-                        }
-                        echo '</ul>';
-                        echo '</div>';
-                    } else {
-                        echo '<div class="error-container" style="display:none;"></div>';
-                    }
-                    ?>
-                </div>
-                <div class="form-group">
-                    <label for="productName">Product name:</label>
-                    <input type="text" id="productName" name="productName" placeholder="Please enter a product name"
-                        required>
+                    <label for="productName">Product Name:</label>
+                    <input type="text" id="productName" name="productName" value="<?= $productData['Name'] ?>"
+                        placeholder="Product name" required>
                 </div>
                 <div class="form-group">
                     <label for="category">Category:</label>
                     <select id="category" name="category" required>
-                        <option value="" disabled selected>Please select a category</option>
+                        <option value="" disabled>Please select a category</option>
                         <?php
                         $categorySql = "SELECT CategoryID, Name FROM Category";
                         $categoryStatement = $conn->prepare($categorySql);
@@ -126,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group">
                     <label for="productWarehouse">Warehouse:</label>
                     <select id="productWarehouse" name="productWarehouse" required>
-                        <option value="" disabled selected>Please select a warehouse</option>
+                        <option value="" disabled>Please select a warehouse</option>
                         <?php
                         $warehouseSql = "SELECT WarehouseID, Name FROM Warehouse";
                         $warehouseStatement = $conn->prepare($warehouseSql);
@@ -145,24 +104,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         } else {
                             echo "0 results";
                         }
+
+                        $conn = null; // Close the PDO connection
                         ?>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="productDescription">Description:</label>
-                    <textarea id="productDescription" name="productDescription"
-                        placeholder="Please enter the description" required></textarea>
+                    <textarea id="productDescription" name="productDescription" placeholder="Description"
+                        required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="productPrice">Price (RM):</label>
-                    <input type="text" id="productPrice" name="productPrice" placeholder="Please enter a price"
+                    <input type="number" id="productPrice" name="productPrice" placeholder="Price"
                         oninput="validateNumberInput(this)" required>
                 </div>
                 <div class="form-group">
                     <label for="productQuantity">Quantity:</label>
-                    <input type="number" id="productQuantity" name="productQuantity"
-                        placeholder="Please enter a quantity" oninput="validateNumberInput(this)" required>
+                    <input type="number" id="productQuantity" name="productQuantity" placeholder="Quantity"
+                        oninput="validateNumberInput(this)" required>
                 </div>
                 <div class="form-group">
                     <button type="submit">Create</button>
