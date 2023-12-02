@@ -1,13 +1,45 @@
 <?php
 ob_start(); // Start output buffering
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 $pageTitle = "Customer/New";
 include '../database/database-connect.php';
 include '../contain/header.php';
 
 // Initialize errors array
 $errors = [];
+
+function validateCustomerData($customerName, $contact, $email, $address, $remark, &$errors)
+{
+    // Validate customer name
+    if (empty($customerName)) {
+        $errors[] = "Customer name is required.";
+    } elseif (strlen($customerName) > 255) {
+        $errors[] = "Customer name must be 255 characters or less.";
+    }
+
+    // Validate contact
+    if (strlen($contact) > 20) {
+        $errors[] = "Contact must be 20 characters or less.";
+    }
+
+    // Validate email
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
+    } elseif (strlen($email) > 255) {
+        $errors[] = "Email must be 255 characters or less.";
+    }
+
+    // Validate address
+    if (strlen($address) > 255) {
+        $errors[] = "Address must be 255 characters or less.";
+    }
+
+    // Validate remark
+    if (strlen($remark) > 255) {
+        $errors[] = "Remark must be 255 characters or less.";
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Process form data
@@ -24,27 +56,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!empty($errors)) {
         displayErrors($errors);
     } else {
-        try {
-            // Perform database insertion using prepared statement
-            $sql = "INSERT INTO Customer (Name, Contact, Email, Address, Remark) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(1, $customerName, PDO::PARAM_STR);
-            $stmt->bindParam(2, $contact, PDO::PARAM_STR);
-            $stmt->bindParam(3, $email, PDO::PARAM_STR);
-            $stmt->bindParam(4, $address, PDO::PARAM_STR);
-            $stmt->bindParam(5, $remark, PDO::PARAM_STR);
+        // Perform database insertion using prepared statement
+        $sql = "INSERT INTO Customer (Name, Contact, Email, Address, Remark) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $customerName, PDO::PARAM_STR);
+        $stmt->bindParam(2, $contact, PDO::PARAM_STR);
+        $stmt->bindParam(3, $email, PDO::PARAM_STR);
+        $stmt->bindParam(4, $address, PDO::PARAM_STR);
+        $stmt->bindParam(5, $remark, PDO::PARAM_STR);
 
-            if ($stmt->execute()) {
-                header("Location: customer.php");
-                exit();
-            } else {
-                echo "Error: " . $stmt->errorInfo()[2];
-            }
-
-            $stmt->closeCursor();
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
+        if ($stmt->execute()) {
+            header("Location: customer.php");
+            exit();
+        } else {
+            echo "Error: " . $stmt->errorInfo()[2];
         }
+
+        $stmt->closeCursor();
     }
 }
 
