@@ -105,8 +105,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $categorySql = "SELECT * FROM Category";
                         $categoryResult = $conn->query($categorySql);
 
-                        if ($categoryResult->num_rows > 0) {
-                            while ($categoryRow = $categoryResult->fetch_assoc()) {
+                        if ($categoryResult->rowCount() > 0) {
+                            while ($categoryRow = $categoryResult->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<option value='" . $categoryRow['CategoryID'] . "'>" . $categoryRow['Name'] . "</option>";
                             }
                         }
@@ -121,8 +121,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $warehouseSql = "SELECT * FROM Warehouse";
                         $warehouseResult = $conn->query($warehouseSql);
 
-                        if ($warehouseResult->num_rows > 0) {
-                            while ($warehouseRow = $warehouseResult->fetch_assoc()) {
+                        if ($warehouseResult->rowCount() > 0) {
+                            while ($warehouseRow = $warehouseResult->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<option value='" . $warehouseRow['WarehouseID'] . "'>" . $warehouseRow['Name'] . "</option>";
                             }
                         }
