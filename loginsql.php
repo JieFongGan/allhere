@@ -79,7 +79,7 @@ if ($username && $password) {
                     $_SESSION['companyname'] = $companyname;
                     $_SESSION['username'] = $username;
                     $_SESSION['userrole'] = $userrole;
-                    header("Location: layout/homepage.php");
+                    header("Location: dashboard/homepage.php");
                     echo "Login successful";
                     exit;
                 } else {
