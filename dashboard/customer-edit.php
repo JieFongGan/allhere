@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 $pageTitle = "Customer/Edit";
 include '../database/database-connect.php';
 include '../contain/header.php';
@@ -110,6 +111,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </main>
 </div>
+
+<?php
+ob_end_flush(); // Flush the output buffer and turn off output buffering
+?>
+
 </body>
 
 </html>
