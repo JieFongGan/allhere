@@ -2,8 +2,9 @@
 session_start();
 ob_start(); // Start output buffering
 
+// Include header and database connection
 $pageTitle = "Transactions/New-product";
-require_once("../database/database-connect.php");
+include("../database/database-connect.php");
 include '../contain/header.php';
 
 // Check if the form is submitted
@@ -30,17 +31,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // If there are no errors, proceed with database operations
     if (empty($errors)) {
         // Insert transaction information
-        $insertTransactionSql = "INSERT INTO [Transaction] (WarehouseID, TransactionType, CustomerID, TransactionDate, DeliveryStatus) VALUES (?, ?, ?, NOW(), 'Pending')";
-        $stmt = $conn->prepare($insertTransactionSql);
-        $stmt->execute([$_SESSION['selectedWarehouse'], $_SESSION['selectedTransactionType'], $_SESSION['selectedCustomer']]);
-        $stmt->close();
+        $insertTransactionSql = "INSERT INTO Transaction (WarehouseID, TransactionType, CustomerID, TransactionDate, DeliveryStatus) VALUES (?, ?, ?, NOW(), 'Pending')";
+        $stmtTransaction = $conn->prepare($insertTransactionSql);
+        $stmtTransaction->bind_param("iss", $_SESSION['selectedWarehouse'], $_SESSION['selectedTransactionType'], $_SESSION['selectedCustomer']);
+        $stmtTransaction->execute();
+        $stmtTransaction->close();
 
         // Get the ID of the last inserted transaction
-        $lastTransactionId = $conn->lastInsertId();
+        $lastTransactionId = $conn->insert_id;
 
         // Insert selected products and quantities into a transaction details table
         $insertDetailsSql = "INSERT INTO TransactionDetail (TransactionID, ProductID, Quantity) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($insertDetailsSql);
+        $stmtDetails = $conn->prepare($insertDetailsSql);
 
         // Loop through all products to check if the checkbox is selected
         foreach ($selectedProducts as $key => $productId) {
@@ -49,7 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // Check if the checkbox for this product is checked
             if (isset($_POST['selectedProducts'][$productId])) {
                 // Process the selected product
-                $stmt->execute([$lastTransactionId, $productId, $quantity]);
+                $stmtDetails->bind_param("iii", $lastTransactionId, $productId, $quantity);
+                $stmtDetails->execute();
 
                 // Update the product quantity based on the transaction type
                 $updateQuantitySql = "UPDATE Product SET Quantity = Quantity ";
@@ -65,12 +68,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $updateQuantitySql .= " WHERE ProductID = ?";
 
                 $stmtUpdateQuantity = $conn->prepare($updateQuantitySql);
-                $stmtUpdateQuantity->execute([$quantity, $productId]);
+                $stmtUpdateQuantity->bind_param("ii", $quantity, $productId);
+                $stmtUpdateQuantity->execute();
                 $stmtUpdateQuantity->close();
             }
         }
 
-        $stmt->close();
+        $stmtDetails->close();
 
         // Redirect to the next page or display a success message
         header("Location: transaction.php");
@@ -89,10 +93,11 @@ $selectedWarehouse = $_SESSION['selectedWarehouse'];
 
 // Fetch product data based on the selected warehouse
 $productSql = "SELECT ProductID, Name, Price FROM Product WHERE WarehouseID = ?";
-$stmt = $conn->prepare($productSql);
-$stmt->execute([$selectedWarehouse]);
-$productResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$stmt->close();
+$stmtProduct = $conn->prepare($productSql);
+$stmtProduct->bind_param("i", $selectedWarehouse);
+$stmtProduct->execute();
+$productResult = $stmtProduct->get_result();
+$stmtProduct->close();
 ?>
 
 <div class="main-content">
@@ -121,8 +126,8 @@ $stmt->close();
                         </thead>
                         <tbody id="productTableBody">
                             <?php
-                            if ($productResult && count($productResult) > 0) {
-                                foreach ($productResult as $product) {
+                            if ($productResult && $productResult->num_rows > 0) {
+                                while ($product = $productResult->fetch_assoc()) {
                                     echo '<tr>
                             <td>' . $product["ProductID"] . '</td>
                             <td>' . $product["Name"] . '</td>
