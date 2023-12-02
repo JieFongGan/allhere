@@ -72,7 +72,7 @@ $conn = null; // Close the main database connection
 
     <main>
         <div class="button-and-search">
-            <button name="createUser"><a href="settings-user-create.php"
+            <button name="createUser"><a href="settings-user-new.php"
                     style="text-decoration: none; color: white;">Create new user</a></button>
             <input type="text" id="searchInput" placeholder="Search on current list..." onkeyup="searchTable()">
         </div>

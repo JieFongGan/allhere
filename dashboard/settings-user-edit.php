@@ -8,7 +8,7 @@ if (isset($_GET['userID'])) {
     $userID = $_GET['userID'];
 
     // Fetch user information based on the user ID
-    $sql = "SELECT * FROM User WHERE UserID = ?";
+    $sql = "SELECT * FROM [User] WHERE UserID = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(1, $userID, PDO::PARAM_INT);
     $stmt->execute();
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         try {
             // Update the user's UserRole and UserStatus in the database
-            $updateSql = "UPDATE User SET UserRole = ?, UserStatus = ? WHERE UserID = ?";
+            $updateSql = "UPDATE [User] SET UserRole = ?, UserStatus = ? WHERE UserID = ?";
             $updateStmt = $conn->prepare($updateSql);
             $updateStmt->bindParam(1, $userRole, PDO::PARAM_STR);
             $updateStmt->bindParam(2, $userStatus, PDO::PARAM_STR);
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $connn = new PDO('mysql:host=localhost;dbname=adminallhere', 'root', '');
 
                 // Update user status in the new connection
-                $sql = "UPDATE User SET Status = ? WHERE UserID = ?";
+                $sql = "UPDATE [User] SET Status = ? WHERE UserID = ?";
                 $stmt = $connn->prepare($sql);
                 $stmt->bindParam(1, $userStatus, PDO::PARAM_STR);
                 $stmt->bindParam(2, $userData['Username'], PDO::PARAM_STR);
@@ -61,10 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header('Location: settings-user.php');
                     exit();
                 } else {
-                    echo "Error updating user status: " . $connn->errorInfo()[2];
+                    echo "Error updating user status: " . $stmt->errorInfo()[2];
                 }
             } else {
-                echo "Error updating user details: " . $conn->errorInfo()[2];
+                echo "Error updating user details: " . $updateStmt->errorInfo()[2];
             }
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
