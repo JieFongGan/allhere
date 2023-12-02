@@ -71,6 +71,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+// Close the database connection
+$conn = null;
 ?>
 
 <div class="main-content">

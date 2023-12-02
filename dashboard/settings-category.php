@@ -10,10 +10,8 @@ $result = $conn->query($sql);
 
 $categories = [];
 
-if ($result->rowCount() > 0) {
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $categories[] = $row;
-    }
+if ($result !== false) {
+    $categories = $result->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /// Process form data when the form is submitted
@@ -23,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $deleteSql = "DELETE FROM Category WHERE CategoryID = :categoryIDToDelete";
         $stmt = $conn->prepare($deleteSql);
         $stmt->bindParam(':categoryIDToDelete', $categoryIDToDelete, PDO::PARAM_INT);
-        
+
         if ($stmt->execute()) {
             // Refresh the categories list after successful deletion
             header("Location: settings-category.php");
