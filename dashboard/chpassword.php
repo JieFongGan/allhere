@@ -1,7 +1,7 @@
 <?php
 ob_start(); // Start output buffering
 $pageTitle = "Profile";
-include("../database/database-connect.php");
+include '../database/database-connect.php';
 include '../contain/header.php';
 
 // Fetch user data based on the username

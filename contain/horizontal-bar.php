@@ -13,8 +13,8 @@
                 </p>
             <img src="../img/user-profile.png" alt="Social Icon" id="social-icon">
             <ul class="dropdown">
-                <li><a href="../layout/profile.php">Profile</a></li>
-                <li><a href="../layout/chpassword.php">Change Password</a></li>
+                <li><a href="../dashboard/profile.php">Profile</a></li>
+                <li><a href="../dashboard/chpassword.php">Change Password</a></li>
                 <li><a href="../logout.php">log out</a></li>
             </ul>
         </div>
