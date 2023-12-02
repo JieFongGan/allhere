@@ -102,33 +102,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <select id="category" name="category" required>
                         <option value="" disabled selected>Please select a category</option>
                         <?php
-                        $categorySql = "SELECT * FROM Category";
-                        $categoryResult = $conn->query($categorySql);
+                        $categorySql = "SELECT CategoryID, Name FROM Category";
+                        $categoryStatement = $conn->prepare($categorySql);
+                        $categoryStatement->execute();
 
-                        if ($categoryResult->rowCount() > 0) {
-                            while ($categoryRow = $categoryResult->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value='" . $categoryRow['CategoryID'] . "'>" . $categoryRow['Name'] . "</option>";
+                        $categoryResult = $categoryStatement->fetchAll(PDO::FETCH_ASSOC);
+
+                        if ($categoryResult) {
+                            foreach ($categoryResult as $category) {
+                                ?>
+                                <option value="<?= $category["CategoryID"] ?>">
+                                    <?= $category["Name"] ?>
+                                </option>
+                                <?php
                             }
+                        } else {
+                            echo "0 results";
                         }
                         ?>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label for="productWarehouse">Warehouse:</label>
                     <select id="productWarehouse" name="productWarehouse" required>
                         <option value="" disabled selected>Please select a warehouse</option>
                         <?php
-                        $warehouseSql = "SELECT * FROM Warehouse";
-                        $warehouseResult = $conn->query($warehouseSql);
+                        $warehouseSql = "SELECT WarehouseID, Name FROM Warehouse";
+                        $warehouseStatement = $conn->prepare($warehouseSql);
+                        $warehouseStatement->execute();
 
-                        if ($warehouseResult->rowCount() > 0) {
-                            while ($warehouseRow = $warehouseResult->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value='" . $warehouseRow['WarehouseID'] . "'>" . $warehouseRow['Name'] . "</option>";
+                        $warehouseResult = $warehouseStatement->fetchAll(PDO::FETCH_ASSOC);
+
+                        if ($warehouseResult) {
+                            foreach ($warehouseResult as $warehouse) {
+                                ?>
+                                <option value="<?= $warehouse["WarehouseID"] ?>">
+                                    <?= $warehouse["Name"] ?>
+                                </option>
+                                <?php
                             }
+                        } else {
+                            echo "0 results";
                         }
                         ?>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label for="productDescription">Description:</label>
                     <textarea id="productDescription" name="productDescription"
