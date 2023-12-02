@@ -1,10 +1,10 @@
 <?php
-session_start();
 ob_start(); // Start output buffering
+session_start();
 
 // Include header and database connection
 $pageTitle = "Transactions/New-product";
-require_once("../database/database-connect.php");
+include '../database/database-connect.php';
 include '../contain/header.php';
 
 // Check if the form is submitted

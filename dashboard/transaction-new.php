@@ -1,8 +1,9 @@
 <?php
-session_start(); // Start the session
 ob_start(); // Start output buffering
+session_start(); // Start the session
+
 $pageTitle = "Transaction/New";
-require_once("../database/database-connect.php");
+include '../database/database-connect.php';
 include '../contain/header.php';
 
 // Fetch warehouse data using PDO
