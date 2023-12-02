@@ -8,12 +8,10 @@ $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Process form data
-    $warehouseName = mysqli_real_escape_string($conn, $_POST["warehouseName"]);
-    $address = mysqli_real_escape_string($conn, $_POST["address"]);
-    $contact = mysqli_real_escape_string($conn, $_POST["contact"]);
-    $email = mysqli_real_escape_string($conn, $_POST["email"]);
-
-    // Additional validation checks
+    $warehouseName = $_POST["warehouseName"];
+    $address = $_POST["address"];
+    $contact = $_POST["contact"];
+    $email = $_POST["email"];
 
     // Validate warehouse name
     if (empty($warehouseName)) {
@@ -47,19 +45,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo "<p class='error'>$error</p>";
         }
     } else {
-        // Perform database insertion
-        $insertSql = "INSERT INTO Warehouse (Name, Address, Contact, Email) VALUES (?, ?, ?, ?)";
+        // Perform database insertion using PDO
+        $insertSql = "INSERT INTO Warehouse (Name, Address, Contact, Email) VALUES (:name, :address, :contact, :email)";
         $stmt = $conn->prepare($insertSql);
-        $stmt->bind_param("ssss", $warehouseName, $address, $contact, $email);
+        $stmt->bindParam(':name', $warehouseName);
+        $stmt->bindParam(':address', $address);
+        $stmt->bindParam(':contact', $contact);
+        $stmt->bindParam(':email', $email);
 
         if ($stmt->execute()) {
             header("Location: warehouse.php");
             exit();
         } else {
-            echo "Error: " . $stmt->error;
+            echo "Error: " . $stmt->errorInfo()[2];
         }
-
-        $stmt->close();
     }
 }
 ?>

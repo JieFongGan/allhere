@@ -1,7 +1,7 @@
 <?php
 ob_start(); // Start output buffering
 $pageTitle = "Warehouse/Edit";
-include("../database/database-connect.php");
+include '../database/database-connect.php';
 include '../contain/header.php';
 
 if (isset($_GET['warehouseID'])) {
@@ -10,19 +10,16 @@ if (isset($_GET['warehouseID'])) {
     // Fetch warehouse information based on the warehouse ID
     $sql = "SELECT * FROM Warehouse WHERE WarehouseID = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $warehouseID);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$warehouseID]);
+    $warehouseData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows > 0) {
-        $warehouseData = $result->fetch_assoc();
-    } else {
+    if (!$warehouseData) {
         // Handle the case where no warehouse is found with the given ID
         echo "Warehouse not found.";
         exit();
     }
 
-    $stmt->close();
+    $stmt->closeCursor();
 } else {
     // Handle the case where warehouse ID is not set
     echo "Warehouse ID not specified.";
@@ -48,22 +45,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                       Email = ? 
                       WHERE WarehouseID = ?";
         $updateStmt = $conn->prepare($updateSql);
-        $updateStmt->bind_param("ssssi", $warehouseName, $address, $contact, $email, $warehouseID);
-        $updateStmt->execute();
+        $updateStmt->execute([$warehouseName, $address, $contact, $email, $warehouseID]);
 
         // Check if the update was successful
-        if ($updateStmt->affected_rows > 0) {
+        if ($updateStmt->rowCount() > 0) {
             echo "Warehouse updated successfully.";
             header("Location: warehouse.php");
             exit();
         } else {
-            echo "Error updating warehouse: " . $updateStmt->error;
+            echo "Error updating warehouse.";
         }
-
-        $updateStmt->close();
     }
 }
-
 ?>
 
 <div class="main-content">
