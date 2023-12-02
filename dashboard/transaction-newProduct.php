@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $conn->beginTransaction();
 
             // Insert transaction information
-            $insertTransactionSql = "INSERT INTO [Transaction] (WarehouseID, TransactionType, CustomerID, TransactionDate, DeliveryStatus) VALUES (?, ?, ?, NOW(), 'Pending')";
+            $insertTransactionSql = "INSERT INTO [Transaction] (WarehouseID, TransactionType, CustomerID, TransactionDate, DeliveryStatus) VALUES (?, ?, ?, GETDATE(), 'Pending')";
             $stmtTransaction = $conn->prepare($insertTransactionSql);
             $stmtTransaction->execute([$_SESSION['selectedWarehouse'], $_SESSION['selectedTransactionType'], $_SESSION['selectedCustomer']]);
             $lastTransactionId = $conn->lastInsertId();
