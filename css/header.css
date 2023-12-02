@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+    --main-color: #3A62D7;
+    --color-dark: #1D2231;
+    --text-grey: #8390A2;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style-type: none;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f1f5f9;
+}
+
+/* sidebar */
+#sidebar-toggle {
+    display: none;
+}
+
+.sidebar {
+    height: 100%;
+    width: 240px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    background: var(--main-color);
+    color: #fff;
+    overflow-y: auto;
+    transition: width 500ms;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    padding: 0rem 1rem;
+}
+
+.sidebar-menu {
+    padding: 1rem;
+}
+
+.sidebar li {
+    margin-bottom: 1.5rem;
+    transition: transform .2s;
+}
+
+.sidebar a {
+    color: #fff;
+    font-size: 1rem;
+}
+
+.sidebar a span:last-child {
+    padding-left: .6rem;
+}
+
+.sidebar li:hover {
+    transform: scale(1.1);
+}
+
+#sidebar-toggle:checked~.sidebar {
+    width: 60px;
+}
+
+#sidebar-toggle:checked~.sidebar .sidebar-header h3 span,
+#sidebar-toggle:checked~.sidebar li span:last-child {
+    display: none;
+}
+
+#sidebar-toggle:checked~.sidebar .sidebar-header,
+#sidebar-toggle:checked~.sidebar li {
+    display: flex;
+    justify-content: center;
+}
+
+#sidebar-toggle:checked~.main-content {
+    margin-left: 60px;
+}
+
+#sidebar-toggle:checked~.main-content header {
+    left: 60px;
+    width: calc(100% - 60px);
+}
+
+/* content wrap */
+.main-content {
+    position: relative;
+    margin-left: 240px;
+    transition: margin-left 500ms;
+}
+
+/* horizontal bar */
+header {
+    position: fixed;
+    left: 240px;
+    top: 0;
+    z-index: 100;
+    width: calc(100% - 240px);
+    background: #fff;
+    height: 60px;
+    padding: 0rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    transition: left 500ms;
+}
+
+.directory-tag {
+    display: flex;
+    align-items: center;
+}
+
+.directory-tag p,
+.social-icons span {
+    font-size: 1.5rem;
+}
+
+.social-icons {
+    position: relative;
+}
+
+.social-icons .social-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.social-icons img {
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.social-icons .dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    white-space: nowrap;
+    display: none;
+}
+
+.social-icons .dropdown li {
+    text-align: center;
+    padding: 8px;
+}
+
+.social-icons .dropdown a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+.social-icons .dropdown li:hover,
+.social-icons .dropdown li:hover a {
+    background-color: var(--main-color);
+    color: #fff;
+}
+
+@media only screen and (max-width: 1200px) {
+    .sidebar {
+        width: 60px;
+        z-index: 150;
+    }
+
+    .sidebar .sidebar-header h3 span,
+    .sidebar li span:last-child {
+        display: none;
+    }
+
+    .sidebar .sidebar-header,
+    .sidebar li {
+        display: flex;
+        justify-content: center;
+    }
+
+    .main-content {
+        margin-left: 60px;
+    }
+
+    .main-content header {
+        left: 60px;
+        width: calc(100% - 60px);
+    }
+
+    #sidebar-toggle:checked~.sidebar {
+        width: 240px;
+    }
+
+    #sidebar-toggle:checked~.sidebar .sidebar-header h3 span,
+    #sidebar-toggle:checked~.sidebar li span:last-child {
+        display: inline;
+    }
+
+    #sidebar-toggle:checked~.sidebar .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #sidebar-toggle:checked~.sidebar li {
+        display: block;
+    }
+
+    #sidebar-toggle:checked~.main-content {
+        margin-left: 60px;
+    }
+
+    #sidebar-toggle:checked~.main-content header {
+        left: 60px;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    main {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .directory-tag p,
+    .social-icons span {
+        font-size: 1rem;
+    }
+}
