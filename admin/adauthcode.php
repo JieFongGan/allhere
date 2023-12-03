@@ -1,4 +1,17 @@
 <?php
+
+// Start the session
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_SESSION['admin'])) {
+    $admin = $_SESSION['admin'];
+} else {
+    header("Location: adlogin.php");
+    exit();
+}
+
 function generateRandomAuthCode($existingAuthCodes) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $length = 7;

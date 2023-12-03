@@ -1,4 +1,17 @@
 <?php
+
+// Start the session
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_SESSION['admin'])) {
+    $admin = $_SESSION['admin'];
+} else {
+    header("Location: adlogin.php");
+    exit();
+}
+
 // Connect to the database
 $serverName = "tcp:allhereserver.database.windows.net,1433";
 $database = "allheredb";
