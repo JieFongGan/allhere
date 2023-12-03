@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if username and password match
     if (count($results) == 1) {
-        $_SESSION["admin"] = $admin;
+        $_SESSION["admin"] = $username;
         header("Location: admincomplist.php");
         exit();
     } else {
