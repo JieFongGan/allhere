@@ -75,7 +75,7 @@ $conn = null;
 <html>
 
 <head>
-    <title>Edit Company</title>
+    <title>Edit User</title>
     <style>
         /* Add your CSS styling here */
         .container {
@@ -123,9 +123,9 @@ $conn = null;
 
 <body>
     <div class="container" style="margin: 0 auto; width: 50%;">
-        <h2>Edit Company Details</h2>
+        <h2>Edit User Details</h2>
         <form method="POST" action="">
-            <label for="userid">UserID:</label>
+            <label for="userid">User ID:</label>
             <input type="text" id="userid" name="userid" value="<?php echo $_GET['userid']; ?>" readonly><br><br>
 
             <label for="companyname">Company Name:</label>

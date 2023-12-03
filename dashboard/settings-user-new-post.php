@@ -102,11 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':newusername', $newusername);
     $stmt->execute();
 
-    if ($stmt->rowCount() > 0) {
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
         $_SESSION['error_message'] = "Username already exists";
         header("Location: settings-user-new.php");
         exit;
     }
+
 
     // Get the biggest UserID and increment it by 1
     $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
