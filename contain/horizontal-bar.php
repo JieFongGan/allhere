@@ -15,7 +15,7 @@
             <ul class="dropdown">
                 <li><a href="../dashboard/profile.php">Profile</a></li>
                 <li><a href="../dashboard/chpassword.php">Change Password</a></li>
-                <li><a href="../logout.php">log out</a></li>
+                <li><a href="../logout.php">Log Out</a></li>
             </ul>
         </div>
     </div>
