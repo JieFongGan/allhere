@@ -4,6 +4,7 @@ $pageTitle = "Settings/Users";
 include '../database/database-connect.php';
 include '../contain/header.php';
 
+
 try {
     // Fetch all users
     $sqlAllUsers = "SELECT * FROM [User]";
@@ -22,8 +23,17 @@ try {
         $stmtGetUsername->execute();
         $usernameToDelete = $stmtGetUsername->fetchColumn();
 
-        // Create a new connection for the other database
-        $connn = new PDO('mysql:host=localhost;dbname=adminallhere', 'root', '');
+        try {
+            $connn = new PDO("sqlsrv:server=$serverName;Database=adminallhere", $uid, $pwd);
+            $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            // Log the error to a file for debugging purposes
+            error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+            // Display a user-friendly message
+            echo "Connection failed. Please try again later.";
+            exit();
+        }
+        
 
         // Use a prepared statement to prevent SQL injection
         $sqlDeleteOtherTable = "DELETE FROM [user] WHERE UserID = ?";
