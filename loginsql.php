@@ -54,7 +54,7 @@ if ($username && $password) {
             }
 
             $cone = new PDO(
-                "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = easywire",
+                "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = $companyname",
                 "sqladmin",
                 "#Allhere",
                 array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
