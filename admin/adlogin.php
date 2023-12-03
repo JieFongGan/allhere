@@ -1,30 +1,40 @@
 <?php
+session_start();
+
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get username and password from form
     $username = $_POST["username"];
     $password = $_POST["password"];
 
-    $conn = new PDO(
-        "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
-        "sqladmin",
-        "#Allhere",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-    );
+    try {
+        // Connect to the Azure SQL Database
+        $conn = new PDO(
+            "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
+            "sqladmin",
+            "#Allhere",
+            array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+        );
 
-    // Prepare and execute the query
-    $stmt = $conn->prepare("SELECT * FROM admin WHERE AdminID = ? AND AdminPassword = ?");
-    $stmt->execute([$username, $password]);
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Prepare and execute the query with parameters
+        $stmt = $conn->prepare("SELECT * FROM admin WHERE AdminID = :username");
+        $stmt->execute(['username' => $username]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check if username and password match
-    if (count($results) == 1) {
-        $_SESSION["admin"] = $username;
-        header("Location: admincomplist.php");
+        // Check if username and password match
+        if ($result && password_verify($password, $result['AdminPassword'])) {
+            $_SESSION["admin"] = $username;
+            header("Location: admincomplist.php");
+            exit();
+        } else {
+            // Display error message
+            echo "Incorrect username or password";
+        }
+    } catch (PDOException $e) {
+        // Log the error and handle it appropriately
+        error_log("Database connection failed: " . $e->getMessage(), 3, "error.log");
+        echo "Database connection failed. Please try again later.";
         exit();
-    } else {
-        // Display error message
-        echo "Incorrect username or password";
     }
 }
 ?>
