@@ -75,32 +75,6 @@ function validatePassword($password)
     }
 }
 
-// Check the connection
-try {
-    $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
-    $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-    // Log the error to a file for debugging purposes
-    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-    // Display a user-friendly message
-    echo "Connection failed. Please try again later.";
-    exit();
-}
-
- // Check if username already exists
- $sql = "SELECT * FROM [user] WHERE Username = :newusername";
- $stmt = $connn->prepare($sql);
- $stmt->bindParam(':newusername', $newusername);
- $stmt->execute();
-
- $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
- if ($result) {
-     $_SESSION['error_message'] = "Username already exists";
-     header("Location: settings-user-new.php");
-     exit;
- }
-
 //Create user data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Replace these values with your Azure SQL Database connection details
@@ -119,6 +93,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Display a user-friendly message
         echo "Connection failed. Please try again later.";
         exit();
+    }
+
+
+    // Check if username already exists
+    $sql = "SELECT * FROM [user] WHERE Username = :newusername";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':newusername', $newusername);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        $_SESSION['error_message'] = "Username already exists";
+        header("Location: settings-user-new.php");
+        exit;
     }
 
     // Get the biggest UserID and increment it by 1
@@ -146,6 +133,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->beginTransaction();
         $stmt->execute();
+
+        // Check the connection
+        try {
+        $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+        $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+        // Log the error to a file for debugging purposes
+        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+        // Display a user-friendly message
+        echo "Connection failed. Please try again later.";
+        exit();
+        }
 
         // Create user in the new connection
         $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
