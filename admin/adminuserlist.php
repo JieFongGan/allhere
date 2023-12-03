@@ -185,7 +185,7 @@ if (isset($_SESSION['admin'])) {
         <ul>
             <li><a href="admincomplist.php">Company List</a></li>
             <li><a href="adminuserlist.php">User List</a></li>
-            <li><a href="adlogin.php">Log Out</a></li>
+            <li><a href="adlogout.php">Log Out</a></li>
         </ul>
     </div>
 
