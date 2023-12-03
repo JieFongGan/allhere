@@ -18,7 +18,12 @@ try {
         "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
         "sqladmin",
         "#Allhere",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+        array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::SQLSRV_ATTR_DIRECT_QUERY => true, // This is important for Azure
+            PDO::SQLSRV_ATTR_UID => "sqladmin@allhereserver", // Specify the username with server name
+            PDO::SQLSRV_ATTR_PERSISTENT => true // Use a persistent connection
+        )
     );
 
     // Use prepared statements to prevent SQL injection
@@ -34,15 +39,22 @@ try {
         exit;
     }
 } catch (PDOException $e) {
-    die("Error checking company existence: " . $e->getMessage());
+    $_SESSION['error_message'] = "Error checking company existence: " . $e->getMessage();
+    header("Location: forgetpassword.php");
+    exit;
 }
 
 try {
     $conn = new PDO(
-        "sqlsrv:server = tcp:allhereserver.database.windows.net,1433;Database=$companyName",
+        "sqlsrv:server = tcp:yourserver.database.windows.net,1433;Database=$companyName",
         "sqladmin",
         "#Allhere",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+        array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::SQLSRV_ATTR_DIRECT_QUERY => true,
+            PDO::SQLSRV_ATTR_UID => "yourusername@yourserver",
+            PDO::SQLSRV_ATTR_PERSISTENT => true
+        )
     );
 
     // Use prepared statements to prevent SQL injection
@@ -67,8 +79,8 @@ try {
         $mail->SMTPAuth = true;
         $mail->Username = 'allherewebapp@gmail.com'; // Replace with your SMTP username
         $mail->Password = 'pplcxcrsocwxnkpx'; // Replace with your SMTP password
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
+        $mail->SMTPSecure = 'tls'; // Use TLS instead of SSL
+        $mail->Port = 587; // Azure uses port 587 for TLS
 
         // Recipients
         $mail->setFrom('allherewebapp@gmail.com', 'All Here');
