@@ -4,6 +4,12 @@ $pageTitle = "Settings/Users";
 include '../database/database-connect.php';
 include '../contain/header.php';
 
+// Replace these values with your Azure SQL Database connection details
+$serverName = "tcp:allhereserver.database.windows.net,1433";
+$database = $companyname;
+$uid = "sqladmin";
+$pwd = "#Allhere";
+
 // Check the connection
 try {
     $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
@@ -34,7 +40,7 @@ if (isset($_POST['deleteUser'])) {
     $userIDToDelete = $_POST['deleteUser'];
 
     try {
-        $connn = new PDO("sqlsrv:server=$serverName;Database=adminallhere", $uid, $pwd);
+        $connn = new PDO("sqlsrv:server=$serverName;Database=allheredb", $uid, $pwd);
         $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
         // Log the error to a file for debugging purposes
