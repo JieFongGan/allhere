@@ -54,8 +54,8 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
-        $password = $row['password'];
-        $email = $row['email'];
+        $password = $row['Password'];
+        $email = $row['Email'];
 
         // Send email using PHPMailer
         $mail = new PHPMailer(true);
@@ -88,7 +88,7 @@ try {
         exit;
     }
 } catch (Exception $e) {
-    $_SESSION['error_message'] = "Failed to send email. Error: {$mail->ErrorInfo}";
+    $_SESSION['error_message'] = "Failed to send email. Error: {$e->getMessage()}";
     header("Location: forgetpassword.php");
     exit;
 } finally {
