@@ -17,13 +17,7 @@ try {
     $checkvalidcompany = new PDO(
         "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
         "sqladmin",
-        "#Allhere",
-        array(
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::SQLSRV_ATTR_DIRECT_QUERY => true, // This is important for Azure
-            PDO::SQLSRV_ATTR_UID => "sqladmin@allhereserver", // Specify the username with server name
-            PDO::SQLSRV_ATTR_PERSISTENT => true // Use a persistent connection
-        )
+        "#Allhere"
     );
 
     // Use prepared statements to prevent SQL injection
@@ -48,13 +42,7 @@ try {
     $conn = new PDO(
         "sqlsrv:server = tcp:yourserver.database.windows.net,1433;Database=$companyName",
         "sqladmin",
-        "#Allhere",
-        array(
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::SQLSRV_ATTR_DIRECT_QUERY => true,
-            PDO::SQLSRV_ATTR_UID => "yourusername@yourserver",
-            PDO::SQLSRV_ATTR_PERSISTENT => true
-        )
+        "#Allhere"
     );
 
     // Use prepared statements to prevent SQL injection
