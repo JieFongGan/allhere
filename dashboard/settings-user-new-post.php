@@ -1,5 +1,19 @@
 <?php
 session_start();
+
+$companyid = 1;
+    $newusername = validateName($_POST['username']);
+    $password = validatePassword($_POST['password']);
+    $email = validateEmail($_POST['email']);
+    $phone = validatePhone($_POST['phone']);
+    $firstname = validateInput($_POST['firstName']);
+    $lastname = validateInput($_POST['lastName']);
+    $currentDateTime = date('Y-m-d H:i:s');
+    $userrole = validateInput($_POST['userrole']);
+    $status = "Active";
+
+    $companyname = $_SESSION['companyname'];
+
 function validateInput($data)
 {
     $data = trim($data);
@@ -63,19 +77,6 @@ function validatePassword($password)
 
 //Create user data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $companyid = 1;
-    $newusername = validateName($_POST['username']);
-    $password = validatePassword($_POST['password']);
-    $email = validateEmail($_POST['email']);
-    $phone = validatePhone($_POST['phone']);
-    $firstname = validateInput($_POST['firstName']);
-    $lastname = validateInput($_POST['lastName']);
-    $currentDateTime = date('Y-m-d H:i:s');
-    $userrole = validateInput($_POST['userrole']);
-    $UserStatus = "Active";
-
-    $companyname = $_SESSION['companyname'];
-
     // Replace these values with your Azure SQL Database connection details
     $serverName = "tcp:allhereserver.database.windows.net,1433";
     $database = $companyname;
@@ -94,10 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    
 
     // Check if username already exists
-    $sql = "SELECT * FROM user WHERE Username = :newusername";
+    $sql = "SELECT * FROM [user] WHERE Username = :newusername";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':newusername', $newusername);
     $stmt->execute();
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Get the biggest UserID and increment it by 1
-    $sql = "SELECT MAX(UserID) AS max_id FROM user";
+    $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':phone', $phone);
     $stmt->bindParam(':firstname', $firstname);
     $stmt->bindParam(':lastname', $lastname);
-    $stmt->bindParam(':UserStatus', $UserStatus);
+    $stmt->bindParam(':UserStatus', $status);
     $stmt->bindParam(':userrole', $userrole);
 
     try {

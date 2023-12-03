@@ -46,8 +46,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Check if the update was successful
             if ($updateStmt->rowCount() > 0) {
                 // Create a new connection using the company name
-                $connn = new PDO('mysql:host=localhost;dbname=adminallhere', 'root', '');
-
+                try {
+                    $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+                    $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                } catch (PDOException $e) {
+                    // Log the error to a file for debugging purposes
+                    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+                    // Display a user-friendly message
+                    echo "Connection failed. Please try again later.";
+                    exit();
+                }
                 // Update user status in the new connection
                 $sql = "UPDATE [User] SET Status = ? WHERE UserID = ?";
                 $stmt = $connn->prepare($sql);
