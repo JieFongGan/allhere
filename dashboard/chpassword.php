@@ -1,6 +1,6 @@
 <?php
 ob_start(); // Start output buffering
-$pageTitle = "Profile";
+$pageTitle = "Change Password";
 include '../database/database-connect.php';
 include '../contain/header.php';
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Password updated successfully
                 echo "Password updated successfully.";
-                header("Location: ../index.php");
+                header("Location: homepage.php");
                 exit();
             } catch (PDOException $e) {
                 // Handle the update failure
