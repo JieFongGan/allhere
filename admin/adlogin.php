@@ -6,8 +6,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get username and password from form
     $username = $_POST["username"];
     $password = $_POST["password"];
-    echo $username;
-    echo $password;
 
     try {
         // Connect to the Azure SQL Database
