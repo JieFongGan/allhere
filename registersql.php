@@ -13,7 +13,7 @@ $email = validateEmail($_POST['email']);
 $phone = validatePhone($_POST['phone_number']);
 $firstname = validateInput($_POST['first_name']);
 $lastname = validateInput($_POST['last_name']);
-$lastLoginDate = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+$status = "Active";
 
 // Validate input function
 function validateInput($data)
@@ -135,8 +135,6 @@ if ($companynamestore != "") {
         exit;
     } else {
 
-        
-
         try {
             $cone = new PDO(
                 "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = master",
@@ -147,7 +145,7 @@ if ($companynamestore != "") {
         } catch (PDOException $e) {
             die("Connection failed: " . $e->getMessage());
         }
-        
+
         // Dynamically create the database
         $cone->query("CREATE DATABASE [$companyname] (EDITION = 'basic')");
 
@@ -190,14 +188,14 @@ if ($companynamestore != "") {
             FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
         )");
 
-        $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', {$lastLoginDate->format('Y-m-d H:i:s')} , 'Active')");
+        $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , '$status')");
 
         $cono->query("CREATE TABLE Category (
             CategoryID INT PRIMARY KEY,
             Name VARCHAR(50) NOT NULL,
             Description TEXT
         )");
-        
+
         $cono->query("CREATE TABLE Warehouse (
             WarehouseID INT PRIMARY KEY,
             Name VARCHAR(255) NOT NULL,
@@ -205,7 +203,7 @@ if ($companynamestore != "") {
             Contact VARCHAR(20),
             Email VARCHAR(255)
         )");
-        
+
         $cono->query("CREATE TABLE Customer (
             CustomerID INT PRIMARY KEY,
             Name VARCHAR(255) NOT NULL,
@@ -214,7 +212,7 @@ if ($companynamestore != "") {
             Address VARCHAR(255),
             Remark VARCHAR(255)
         )");
-        
+
         $cono->query("CREATE TABLE Product (
             ProductID INT PRIMARY KEY,
             CategoryID INT,
@@ -227,7 +225,7 @@ if ($companynamestore != "") {
             FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
             FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
         )");
-        
+
         $cono->query("CREATE TABLE [Transaction] (
             TransactionID INT PRIMARY KEY,
             WarehouseID INT,
@@ -238,7 +236,7 @@ if ($companynamestore != "") {
             FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID),
             FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
         )");
-        
+
         $cono->query("CREATE TABLE TransactionDetail (
             TransactionDetailID INT PRIMARY KEY,
             TransactionID INT,
@@ -248,53 +246,48 @@ if ($companynamestore != "") {
             FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
         )");
 
+        // Update Company
+        $sqlUpdateCompany = "UPDATE [Company] SET CompanyName = :companyname, Status = :status WHERE AuthCode = :authCode";
+        $stmtUpdateCompany = $conn->prepare($sqlUpdateCompany);
+        $stmtUpdateCompany->bindParam(':companyname', $companyname, PDO::PARAM_STR);
+        $stmtUpdateCompany->bindParam(':status', $status, PDO::PARAM_STR);
+        $stmtUpdateCompany->bindParam(':authCode', $authCode, PDO::PARAM_STR);
+
+        try {
+            $conn->beginTransaction();
+
+            if ($stmtUpdateCompany->execute()) {
+                echo "Company data updated successfully";
+            } else {
+                echo "Error updating company data: " . $stmtUpdateCompany->errorInfo()[2];
+                $conn->rollBack();
+                exit;
+            }
+
+            // Insert data into the User table
+            $sqlInsertUser = "INSERT INTO [User] (UserID, CompanyName, Status) VALUES (:username, :companyname, :status)";
+            $stmtInsertUser = $conn->prepare($sqlInsertUser);
+            $stmtInsertUser->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmtInsertUser->bindParam(':companyname', $companyname, PDO::PARAM_STR);
+            $stmtInsertUser->bindParam(':status', $status, PDO::PARAM_STR);
+
+            if ($stmtInsertUser->execute()) {
+                echo "User data inserted successfully";
+                $conn->commit();
+            } else {
+                echo "Error inserting user data: " . $stmtInsertUser->errorInfo()[2];
+                $conn->rollBack();
+            }
+
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            $conn->rollBack();
+        }
+
         $_SESSION['companyname'] = $companyname;
         $_SESSION['username'] = $username;
         $_SESSION['userrole'] = "Admin";
         header("Location: dashboard/homepage.php");
-
-
-        // // Connect to the database
-        // $servername = "localhost";
-        // $user = "root";
-        // $password = "";
-        // $dbname = "adminallhere";
-
-        // $conn = new mysqli($servername, $user, $password, $dbname);
-
-        // // Check connection
-        // if ($conn->connect_error) {
-        //     die("Connection failed: " . $conn->connect_error);
-        // }
-
-        // // Insert data into the Company table
-        // $status = "Active";
-        // // Update the Company table
-
-        // $companyname = strtolower($companyname);
-
-        // $sql = "UPDATE Company SET CompanyName = '$companyname', Status = '$status' WHERE AuthCode = '$authCode'";
-
-        // if ($conn->query($sql) === TRUE) {
-        //     echo "Data updated successfully";
-        // } else {
-        //     echo "Error updating data: " . $conn->error;
-        // }
-
-        // // Insert data into the User table
-        // $sql = "INSERT INTO User (UserID, CompanyName, Status) VALUES ('$username', '$companyname', '$status')";
-
-        // if ($conn->query($sql) === TRUE) {
-        //     echo "Data inserted successfully";
-        // } else {
-        //     echo "Error inserting data: " . $conn->error;
-        // }
-
-        // $conn->close();
-        // $_SESSION['companyname'] = $companyname;
-        // $_SESSION['username'] = $username;
-        // $_SESSION['userrole'] = "Admin";
-        // header("Location: layout/homepage.php");
     }
 }
 
