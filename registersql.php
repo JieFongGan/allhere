@@ -190,7 +190,7 @@ if ($companynamestore != "") {
             FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
         )");
 
-        $cono->query("INSERT INTO User (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', Now(), 'Active')");
+        $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , 'Active')");
 
         $cono->query("CREATE TABLE Category (
             CategoryID INT PRIMARY KEY,
