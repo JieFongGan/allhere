@@ -13,7 +13,7 @@ $email = validateEmail($_POST['email']);
 $phone = validatePhone($_POST['phone_number']);
 $firstname = validateInput($_POST['first_name']);
 $lastname = validateInput($_POST['last_name']);
-$currentDateTime = date('Y-m-d H:i:s');
+$lastLoginDate = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
 
 // Validate input function
 function validateInput($data)
@@ -190,7 +190,7 @@ if ($companynamestore != "") {
             FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
         )");
 
-        $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , 'Active')");
+        $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', {$lastLoginDate->format('Y-m-d H:i:s')} , 'Active')");
 
         $cono->query("CREATE TABLE Category (
             CategoryID INT PRIMARY KEY,

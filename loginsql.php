@@ -24,6 +24,8 @@ function validateInput($data)
     return $data;
 }
 
+$lastLoginDate = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+
 if ($username && $password) {
     try {
         $stmt = $conn->prepare("SELECT CompanyName, Status FROM [user] WHERE UserID = :username");
@@ -71,7 +73,7 @@ if ($username && $password) {
 
                 if ($password == $storedPassword) {
                     // Update LastLoginDate
-                    $updateSql = "UPDATE [user] SET LastLoginDate = SYSDATETIME() WHERE Username = :username";
+                    $updateSql = "UPDATE [user] SET LastLoginDate = {$lastLoginDate->format('Y-m-d H:i:s')} WHERE Username = :username";
                     $stmt = $cone->prepare($updateSql);
                     $stmt->bindParam(':username', $username);
                     $stmt->execute();
