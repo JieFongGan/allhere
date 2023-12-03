@@ -76,21 +76,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $companyname = $_SESSION['companyname'];
 
-    // Replace these values with your actual database connection details
-    $servername = "localhost";
-    $dbusername = "root";
-    $dbpassword = "";
+    // Replace these values with your Azure SQL Database connection details
+    $serverName = "tcp:allhereserver.database.windows.net,1433";
     $database = $companyname;
+    $uid = "sqladmin";
+    $pwd = "#Allhere";
 
-    // Create a PDO connection
+    // Check the connection
     try {
-        $conn = new PDO("mysql:host=$servername;dbname=$database", $dbusername, $dbpassword);
+        $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
+        // Log the error to a file for debugging purposes
+        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+        // Display a user-friendly message
+        echo "Connection failed. Please try again later.";
+        exit();
     }
 
-    $connn = new PDO("mysql:host=localhost;dbname=adminallhere", "root", "");
+    
 
     // Check if username already exists
     $sql = "SELECT * FROM user WHERE Username = :newusername";
@@ -112,8 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newUserID = $row['max_id'] + 1;
 
     // Create user
-    $sql = "INSERT INTO User (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
-            VALUES (:newUserID, :companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, NOW())";
+    $sql = "INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
+            VALUES (:newUserID, :companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':newUserID', $newUserID);
     $stmt->bindParam(':companyid', $companyid);
@@ -130,8 +134,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->beginTransaction();
         $stmt->execute();
 
+        // Check the connection
+        try {
+        $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+        $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+        // Log the error to a file for debugging purposes
+        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+        // Display a user-friendly message
+        echo "Connection failed. Please try again later.";
+        exit();
+        }
+
         // Create user in the new connection
-        $sql = "INSERT INTO user (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
+        $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
         $stmt = $connn->prepare($sql);
         $stmt->bindParam(':newusername', $newusername);
         $stmt->bindParam(':companyname', $companyname);

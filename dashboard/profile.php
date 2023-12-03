@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmtUpdateUser->execute()) {
         // Redirect back to the previous page or perform any other action
-        header('Location: ../index.php');
+        header('Location: homepage.php');
         exit;
     } else {
         echo "Error updating user details: " . $stmtUpdateUser->errorInfo()[2];
