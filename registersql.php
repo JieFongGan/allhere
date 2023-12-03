@@ -175,76 +175,76 @@ if ($companynamestore != "") {
         // Insert values into Company table
         $cono->query("INSERT INTO Company (CompanyID, CompanyName, Email, Phone, Address) VALUES ('$companyid', '$companyname', '$companyemail', '$companyphone', '$companyaddress')");
 
-        $cono->query("CREATE TABLE User (
-        UserID INT PRIMARY KEY,
-        CompanyID INT,
-        Username VARCHAR(50) NOT NULL,
-        Password VARCHAR(50) NOT NULL,
-        Email VARCHAR(255),
-        Phone VARCHAR(20),
-        FirstName VARCHAR(50),
-        LastName VARCHAR(50),
-        UserRole VARCHAR(50),
-        LastLoginDate DATETIME,
-        UserStatus VARCHAR(20),
-        FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+        $cono->query("CREATE TABLE [User] (
+            UserID INT PRIMARY KEY,
+            CompanyID INT,
+            Username VARCHAR(50) NOT NULL,
+            Password VARCHAR(255) NOT NULL,
+            Email VARCHAR(255),
+            Phone VARCHAR(20),
+            FirstName VARCHAR(50),
+            LastName VARCHAR(50),
+            UserRole VARCHAR(50),
+            LastLoginDate DATETIME,
+            UserStatus VARCHAR(20),
+            FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
         )");
 
         $cono->query("INSERT INTO User (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', Now(), 'Active')");
 
         $cono->query("CREATE TABLE Category (
-        CategoryID INT PRIMARY KEY,
-        Name VARCHAR(50) NOT NULL,
-        Description TEXT
+            CategoryID INT PRIMARY KEY,
+            Name VARCHAR(50) NOT NULL,
+            Description TEXT
         )");
-
+        
         $cono->query("CREATE TABLE Warehouse (
-        WarehouseID INT PRIMARY KEY,
-        Name VARCHAR(255) NOT NULL,
-        Address VARCHAR(255),
-        Contact VARCHAR(20),
-        Email VARCHAR(255)
+            WarehouseID INT PRIMARY KEY,
+            Name VARCHAR(255) NOT NULL,
+            Address VARCHAR(255),
+            Contact VARCHAR(20),
+            Email VARCHAR(255)
         )");
-
+        
         $cono->query("CREATE TABLE Customer (
-        CustomerID INT PRIMARY KEY,
-        Name VARCHAR(255) NOT NULL,
-        Contact VARCHAR(20),
-        Email VARCHAR(255),
-        Address VARCHAR(255),
-        Remark VARCHAR(255)
+            CustomerID INT PRIMARY KEY,
+            Name VARCHAR(255) NOT NULL,
+            Contact VARCHAR(20),
+            Email VARCHAR(255),
+            Address VARCHAR(255),
+            Remark VARCHAR(255)
         )");
-
+        
         $cono->query("CREATE TABLE Product (
-        ProductID INT PRIMARY KEY,
-        CategoryID INT,
-        WarehouseID INT,
-        Name VARCHAR(255) NOT NULL,
-        Description TEXT,
-        Price DECIMAL(10, 2),
-        Quantity INT,
-        LastUpdatedDate DATETIME,
-        FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
-        FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
+            ProductID INT PRIMARY KEY,
+            CategoryID INT,
+            WarehouseID INT,
+            Name VARCHAR(255) NOT NULL,
+            Description TEXT,
+            Price DECIMAL(10, 2),
+            Quantity INT,
+            LastUpdatedDate DATETIME,
+            FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
+            FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
         )");
-
-        $cono->query("CREATE TABLE Transaction (
-        TransactionID INT PRIMARY KEY,
-        WarehouseID INT,
-        CustomerID INT,
-        TransactionType VARCHAR(50),
-        TransactionDate DATETIME,
-        DeliveryStatus VARCHAR(50),
-        FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID),
-        FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+        
+        $cono->query("CREATE TABLE [Transaction] (
+            TransactionID INT PRIMARY KEY,
+            WarehouseID INT,
+            CustomerID INT,
+            TransactionType VARCHAR(50),
+            TransactionDate DATETIME,
+            DeliveryStatus VARCHAR(50),
+            FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID),
+            FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
         )");
-
+        
         $cono->query("CREATE TABLE TransactionDetail (
             TransactionDetailID INT PRIMARY KEY,
             TransactionID INT,
             ProductID INT,
             Quantity INT,
-            FOREIGN KEY (TransactionID) REFERENCES Transaction(TransactionID),
+            FOREIGN KEY (TransactionID) REFERENCES [Transaction](TransactionID),
             FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
         )");
 
