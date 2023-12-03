@@ -257,14 +257,8 @@ if ($companynamestore != "") {
             $conn->beginTransaction();
 
             if ($stmtUpdateCompany->execute()) {
-                echo "Company data updated successfully";
-            } else {
-                echo "Error updating company data: " . $stmtUpdateCompany->errorInfo()[2];
-                $conn->rollBack();
-                exit;
-            }
-
-            // Insert data into the User table
+                
+                // Insert data into the User table
             $sqlInsertUser = "INSERT INTO [User] (UserID, CompanyName, Status) VALUES (:username, :companyname, :status)";
             $stmtInsertUser = $conn->prepare($sqlInsertUser);
             $stmtInsertUser->bindParam(':username', $username, PDO::PARAM_STR);
@@ -272,22 +266,39 @@ if ($companynamestore != "") {
             $stmtInsertUser->bindParam(':status', $status, PDO::PARAM_STR);
 
             if ($stmtInsertUser->execute()) {
-                echo "User data inserted successfully";
+
+                $_SESSION['companyname'] = $companyname;
+                $_SESSION['username'] = $username;
+                $_SESSION['userrole'] = "Admin";
+                header("Location: dashboard/homepage.php");
                 $conn->commit();
+
+                //close connection
+                $conn = null;
+                $cone = null;
+                $cono = null;
+                exit;   
+                
             } else {
                 echo "Error inserting user data: " . $stmtInsertUser->errorInfo()[2];
                 $conn->rollBack();
             }
+
+
+            } else {
+                echo "Error updating company data: " . $stmtUpdateCompany->errorInfo()[2];
+                $conn->rollBack();
+                exit;
+            }
+
+            
 
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             $conn->rollBack();
         }
 
-        $_SESSION['companyname'] = $companyname;
-        $_SESSION['username'] = $username;
-        $_SESSION['userrole'] = "Admin";
-        header("Location: dashboard/homepage.php");
+        
     }
 }
 

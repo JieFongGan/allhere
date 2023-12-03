@@ -241,7 +241,7 @@
                         $authCode = $_POST['AuthCode'];
                 
                         // Select the CompanyName based on the provided AuthCode
-                        $query = 'SELECT CompanyName FROM company WHERE AuthCode = :authCode';
+                        $query = 'SELECT CompanyName FROM [company] WHERE AuthCode = :authCode';
                         $stmt = $conn->prepare($query);
                         $stmt->bindParam(':authCode', $authCode);
                         $stmt->execute();
@@ -270,55 +270,74 @@
                     // Check if deleteAuthCode is set in the URL
                     if (isset($_GET['deleteAuthCode'])) {
                         $authCodeToDelete = $_GET['deleteAuthCode'];
-                
-                        // Retrieve CompanyName before deletion
-                        $query = "SELECT CompanyName FROM company WHERE AuthCode = :authCodeToDelete";
-                        $stmt = $conn->prepare($query);
-                        $stmt->bindParam(':authCodeToDelete', $authCodeToDelete);
-                        $stmt->execute();
-                
-                        if ($stmt) {
-                            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                            $companyName = $row['CompanyName'];
-                
-                            // Delete all users from the user table with the specified CompanyName
-                            $deleteUsersQuery = "DELETE FROM user WHERE CompanyName = :companyName";
-                            $deleteUsersStmt = $conn->prepare($deleteUsersQuery);
-                            $deleteUsersStmt->bindParam(':companyName', $companyName);
-                            $deleteUsersResult = $deleteUsersStmt->execute();
-                
-                            if (!$deleteUsersResult) {
-                                echo "Error deleting users: " . $conn->errorInfo();
-                            }
-                        }
-                
-                        // Delete the record from the company table
-                        $deleteQueryCompany = "DELETE FROM company WHERE AuthCode = :authCodeToDelete";
-                        $deleteStmtCompany = $conn->prepare($deleteQueryCompany);
-                        $deleteStmtCompany->bindParam(':authCodeToDelete', $authCodeToDelete);
-                        $deleteResultCompany = $deleteStmtCompany->execute();
-                
-                        if ($deleteResultCompany) {
-                            echo "Record deleted successfully.";
-                
-                            // Check if $companyName is not NULL and delete the corresponding database
-                            if ($companyName !== null) {
-                                $deleteDatabaseQuery = "DROP DATABASE $companyName";
-                                $deleteDatabaseStmt = $conn->prepare($deleteDatabaseQuery);
-                                $deleteDatabaseResult = $deleteDatabaseStmt->execute();
-                
-                                if ($deleteDatabaseResult) {
-                                    echo "Database $companyName deleted successfully.";
-                                } else {
-                                    echo "Error deleting database $companyName: " . $conn->errorInfo();
+                    
+                        try {
+                            // Retrieve CompanyName before deletion
+                            $query = "SELECT CompanyName FROM [company] WHERE AuthCode = :authCodeToDelete";
+                            $stmt = $conn->prepare($query);
+                            $stmt->bindParam(':authCodeToDelete', $authCodeToDelete);
+                            $stmt->execute();
+                    
+                            if ($stmt) {
+                                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $companyName = $row['CompanyName'];
+                    
+                                // Delete all users from the user table with the specified CompanyName
+                                $deleteUsersQuery = "DELETE FROM [user] WHERE CompanyName = :companyName";
+                                $deleteUsersStmt = $conn->prepare($deleteUsersQuery);
+                                $deleteUsersStmt->bindParam(':companyName', $companyName);
+                                $deleteUsersResult = $deleteUsersStmt->execute();
+                    
+                                if (!$deleteUsersResult) {
+                                    echo "Error deleting users: " . print_r($deleteUsersStmt->errorInfo(), true);
                                 }
                             }
-                
-                            echo "<script>window.location.href='admincomplist.php';</script>";
-                        } else {
-                            echo "Error deleting record: " . $conn->errorInfo();
+                    
+                            // Delete the record from the company table
+                            $deleteQueryCompany = "DELETE FROM [company] WHERE AuthCode = :authCodeToDelete";
+                            $deleteStmtCompany = $conn->prepare($deleteQueryCompany);
+                            $deleteStmtCompany->bindParam(':authCodeToDelete', $authCodeToDelete);
+                            $deleteResultCompany = $deleteStmtCompany->execute();
+                    
+                            if ($deleteResultCompany) {
+                                echo "Record deleted successfully.";
+                    
+                                // Check if $companyName is not NULL and delete the corresponding database
+                                if ($companyName !== null) {
+                                    try {
+                                        $cone = new PDO(
+                                            "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = master",
+                                            "sqladmin",
+                                            "#Allhere",
+                                            array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+                                        );
+                                    } catch (PDOException $e) {
+                                        die("Connection failed: " . $e->getMessage());
+                                    }
+                    
+                                    // Ensure that the database name is properly quoted
+                                    $quotedDatabaseName = '[' . $companyName . ']';
+                    
+                                    $deleteDatabaseQuery = "DROP DATABASE $quotedDatabaseName";
+                                    $deleteDatabaseStmt = $cone->prepare($deleteDatabaseQuery);
+                                    $deleteDatabaseResult = $deleteDatabaseStmt->execute();
+                    
+                                    if ($deleteDatabaseResult) {
+                                        echo "Database $companyName deleted successfully.";
+                                    } else {
+                                        echo "Error deleting database $companyName: " . print_r($deleteDatabaseStmt->errorInfo(), true);
+                                    }
+                                }
+                    
+                                echo "<script>window.location.href='admincomplist.php';</script>";
+                            } else {
+                                echo "Error deleting record: " . print_r($deleteStmtCompany->errorInfo(), true);
+                            }
+                        } catch (PDOException $e) {
+                            echo "Error: " . $e->getMessage();
                         }
                     }
+                    
                     ?>
                 </table>
             </div>
