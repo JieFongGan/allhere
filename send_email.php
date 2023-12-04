@@ -68,13 +68,13 @@ try {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP server
         $mail->SMTPAuth = true;
-        $mail->Username = 'allherewebapp@gmail.com'; // Replace with your SMTP username
-        $mail->Password = 'pplcxcrsocwxnkpx'; // Replace with your SMTP password
+        $mail->Username = 'tongkf-wm20@student.tarc.edu.my'; // Replace with your SMTP username
+        $mail->Password = 'ozyt ycjk yure ffqb'; // Replace with your SMTP password
         $mail->SMTPSecure = 'tls'; // Use TLS instead of SSL
         $mail->Port = 587; // Azure uses port 587 for TLS
 
         // Recipients
-        $mail->setFrom('allherewebapp@gmail.com', 'All Here');
+        $mail->setFrom('tongkf-wm20@student.tarc.edu.my', 'All Here');
         $mail->addAddress($email); // Add recipient
 
         // Content
