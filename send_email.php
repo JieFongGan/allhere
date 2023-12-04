@@ -14,31 +14,33 @@ $username = $_POST['username'];
 $companyName = $_POST['companyName'];
 
 try {
-    $checkvalidcompany = new PDO(
+    $connn = new PDO(
         "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
         "sqladmin",
         "#Allhere"
     );
+
+    // Use prepared statements to prevent SQL injection
+    $sqlq = "SELECT CompanyName FROM [user] WHERE UserID = :username";
+    $stmt = $connn->prepare($sqlq);
+
+    // Bind parameters using an array with execute
+    $stmt->execute([':username' => $username]);
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $_SESSION['error_message'] = "Company does not exist";
+        header("Location: forgetpassword.php");
+        exit;
+    }
+
 } catch (PDOException $e) {
     $_SESSION['error_message'] = "Error checking company existence: " . $e->getMessage();
     header("Location: forgetpassword.php");
     exit;
 }
 
-// Use prepared statements to prevent SQL injection
-$checkValidCompanyQuery = "SELECT CompanyName FROM [user] WHERE UserID = :username";
-$stmt = $checkvalidcompany->prepare($checkValidCompanyQuery);
-
-// Bind parameters using an array with execute
-$stmt->execute([':username' => $username]);
-
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($row) {
-    $_SESSION['error_message'] = "Company does not exist";
-    header("Location: forgetpassword.php");
-    exit;
-}
 
 
 try {
@@ -50,15 +52,15 @@ try {
 
     // Use prepared statements to prevent SQL injection
     $query = "SELECT Email, Password FROM [user] WHERE Username = :username";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':username', $username);
-    $stmt->execute();
+    $stmte = $conn->prepare($query);
+    $stmte->bindParam(':username', $username);
+    $stmte->execute();
 
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $rows = $stmte->fetch(PDO::FETCH_ASSOC);
 
-    if ($row) {
-        $email = $row['Email'];
-        $password = $row['Password'];
+    if ($rows) {
+        $email = $rows['Email'];
+        $password = $rows['Password'];
 
         // Send email using PHPMailer
         $mail = new PHPMailer(true);
@@ -69,7 +71,7 @@ try {
         $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP server
         $mail->SMTPAuth = true;
         $mail->Username = 'tongkf-wm20@student.tarc.edu.my'; // Replace with your SMTP username
-        $mail->Password = 'ozyt ycjk yure ffqb'; // Replace with your SMTP password
+        $mail->Password = 'grng mjer qrmm ngcd'; // Replace with your SMTP password
         $mail->SMTPSecure = 'tls'; // Use TLS instead of SSL
         $mail->Port = 587; // Azure uses port 587 for TLS
 
@@ -94,8 +96,5 @@ try {
     $_SESSION['error_message'] = "Failed to send email. Error: {$e->getMessage()}";
     header("Location: forgetpassword.php");
     exit;
-} finally {
-    // Close the database connection
-    $conn = null;
 }
 ?>
