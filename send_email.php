@@ -26,11 +26,11 @@ try {
 }
 
 // Use prepared statements to prevent SQL injection
-$checkValidCompanyQuery = "SELECT CompanyName FROM [user] WHERE CompanyName = :companyName";
+$checkValidCompanyQuery = "SELECT CompanyName FROM [user] WHERE UserID = :username";
 $stmt = $checkvalidcompany->prepare($checkValidCompanyQuery);
 
 // Bind parameters using an array with execute
-$stmt->execute([':companyName' => $companyName]);
+$stmt->execute([':username' => $username]);
 
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -49,7 +49,7 @@ try {
     );
 
     // Use prepared statements to prevent SQL injection
-    $query = "SELECT Email, Password FROM [user] WHERE username = :username";
+    $query = "SELECT Email, Password FROM [user] WHERE Username = :username";
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':username', $username);
     $stmt->execute();
@@ -57,8 +57,8 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
-        $password = $row['Password'];
         $email = $row['Email'];
+        $password = $row['Password'];
 
         // Send email using PHPMailer
         $mail = new PHPMailer(true);
