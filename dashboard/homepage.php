@@ -94,33 +94,41 @@ if ($latestTransactionsQuery !== false) {
                     <h3>Recent activity</h3>
 
                     <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Last Updated Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php
-                                foreach ($latestTransactionsResult as $row) {
-                                    $statusClass = ($row['DeliveryStatus'] == 'Pending' || $row['DeliveryStatus'] == 'Processing') ? 'warning' : 'success';
-                                    ?>
+                        <?php if ($latestTransactionsQuery !== false && !empty($latestTransactionsResult)) { ?>
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td><?php echo $row['TransactionType']; ?></td>
-                                        <td><?php echo date('d M, Y', strtotime($row['TransactionDate'])); ?></td>
-                                        <td>
-                                            <span class="badge <?php echo $statusClass; ?>">
-                                                <?php echo $row['DeliveryStatus']; ?>
-                                            </span>
-                                        </td>
+                                        <th>Name</th>
+                                        <th>Last Updated Date</th>
+                                        <th>Status</th>
                                     </tr>
-                                <?php
-                                }
-                                ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    foreach ($latestTransactionsResult as $row) {
+                                        $statusClass = ($row['DeliveryStatus'] == 'Pending' || $row['DeliveryStatus'] == 'Processing') ? 'warning' : 'success';
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <?php echo $row['TransactionType']; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo date('d M, Y', strtotime($row['TransactionDate'])); ?>
+                                            </td>
+                                            <td>
+                                                <span class="badge <?php echo $statusClass; ?>">
+                                                    <?php echo $row['DeliveryStatus']; ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        <?php } else { ?>
+                            <p>No recent activity found.</p>
+                        <?php } ?>
                     </div>
                 </div>
 

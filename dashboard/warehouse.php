@@ -73,8 +73,9 @@ if (isset($_POST['deleteWarehouse'])) {
                     <tr>
                         <th>WarehouseID</th>
                         <th>Name</th>
-                        <th>Location</th>
-                        <th>Capacity</th>
+                        <th>Address</th>
+                        <th>Contact</th>
+                        <th>Email</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -93,10 +94,13 @@ if (isset($_POST['deleteWarehouse'])) {
                                     <?= $warehouse['Name'] ?>
                                 </td>
                                 <td>
-                                    <?= $warehouse['Location'] ?>
+                                    <?= $warehouse['Address'] ?>
                                 </td>
                                 <td>
-                                    <?= $warehouse['Capacity'] ?>
+                                    <?= $warehouse['Contact'] ?>
+                                </td>
+                                <td>
+                                    <?= $warehouse['Action'] ?>
                                 </td>
                                 <td>
                                     <form method="GET" action="warehouse-edit.php">
