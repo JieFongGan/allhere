@@ -7,7 +7,6 @@ require 'phpmailer/src/Exception.php';
 require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/SMTP.php';
 
-// Assuming you have already established a database connection
 session_start(); // Start the session at the beginning of the script
 
 $username = $_POST['username'];
@@ -23,17 +22,16 @@ try {
     // Use prepared statements to prevent SQL injection
     $sqlq = "SELECT CompanyName FROM [user] WHERE UserID = :username";
     $stmt = $connn->prepare($sqlq);
-
-    // Bind parameters using an array with execute
-    $stmt->execute([':username' => $username]);
-
+    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+    $stmt->execute(); // Execute the query
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($row) {
-        $_SESSION['error_message'] = "Company does not exist";
-        header("Location: forgetpassword.php");
-        exit;
+    if (!$row || empty($row['CompanyName'])) {
+    $_SESSION['error_message'] = "Company does not exist";
+    header("Location: forgetpassword.php");
+    exit;
     }
+
 
 } catch (PDOException $e) {
     $_SESSION['error_message'] = "Error checking company existence: " . $e->getMessage();
