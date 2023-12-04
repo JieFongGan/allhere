@@ -171,6 +171,9 @@ if ($companynamestore != "") {
 
         // Insert values into Company table
         $cono->query("INSERT INTO Company (CompanyName, Email, Phone, Address) VALUES ('$companyname', '$companyemail', '$companyphone', '$companyaddress')");
+        
+        // Retrieve the generated CompanyID
+        $companyID = $cono->lastInsertId();
 
         $cono->query("CREATE TABLE [User] (
             UserID INT IDENTITY(1,1) PRIMARY KEY,
