@@ -19,24 +19,27 @@ try {
         "sqladmin",
         "#Allhere"
     );
-
-    // Use prepared statements to prevent SQL injection
-    $checkvalidcompanyquery = "SELECT CompanyName FROM [user] WHERE CompanyName = :companyName";
-    $stmt = $checkvalidcompany->prepare($checkvalidcompanyquery);
-    $stmt->bindParam(':companyName', $companyName);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($row) {
-        $_SESSION['error_message'] = "Company does not exist";
-        header("Location: forgetpassword.php");
-        exit;
-    }
 } catch (PDOException $e) {
     $_SESSION['error_message'] = "Error checking company existence: " . $e->getMessage();
     header("Location: forgetpassword.php");
     exit;
 }
+
+// Use prepared statements to prevent SQL injection
+$checkValidCompanyQuery = "SELECT CompanyName FROM [user] WHERE CompanyName = :companyName";
+$stmt = $checkvalidcompany->prepare($checkValidCompanyQuery);
+
+// Bind parameters using an array with execute
+$stmt->execute([':companyName' => $companyName]);
+
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($row) {
+    $_SESSION['error_message'] = "Company does not exist";
+    header("Location: forgetpassword.php");
+    exit;
+}
+
 
 try {
     $conn = new PDO(
