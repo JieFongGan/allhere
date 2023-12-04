@@ -163,7 +163,7 @@ if ($companynamestore != "") {
 
         // Create tables
         $cono->query("CREATE TABLE Company (
-            CompanyID INT IDENTITY(1,1) PRIMARY KEY,
+            CompanyID INT PRIMARY KEY,
             CompanyName VARCHAR(255) NOT NULL,
             Email VARCHAR(255),
             Phone VARCHAR(20),
