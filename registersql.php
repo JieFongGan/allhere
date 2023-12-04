@@ -174,7 +174,7 @@ if ($companynamestore != "") {
         $cono->query("INSERT INTO Company (CompanyID, CompanyName, Email, Phone, Address) VALUES ('$companyid', '$companyname', '$companyemail', '$companyphone', '$companyaddress')");
 
         $cono->query("CREATE TABLE [User] (
-            UserID INT IDENTITY(1,1) PRIMARY KEY,
+            UserID INT PRIMARY KEY,
             CompanyID INT,
             Username VARCHAR(50) NOT NULL,
             Password VARCHAR(255) NOT NULL,
@@ -191,13 +191,13 @@ if ($companynamestore != "") {
         $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , '$status')");
 
         $cono->query("CREATE TABLE Category (
-            CategoryID INT IDENTITY(1,1) PRIMARY KEY,
+            CategoryID INT PRIMARY KEY,
             Name VARCHAR(50) NOT NULL,
             Description TEXT
         )");
 
         $cono->query("CREATE TABLE Warehouse (
-            WarehouseID INT IDENTITY(1,1) PRIMARY KEY,
+            WarehouseID INT PRIMARY KEY,
             Name VARCHAR(255) NOT NULL,
             Address VARCHAR(255),
             Contact VARCHAR(20),
@@ -205,7 +205,7 @@ if ($companynamestore != "") {
         )");
 
         $cono->query("CREATE TABLE Customer (
-            CustomerID INT IDENTITY(1,1) PRIMARY KEY,
+            CustomerID INT PRIMARY KEY,
             Name VARCHAR(255) NOT NULL,
             Contact VARCHAR(20),
             Email VARCHAR(255),
@@ -214,7 +214,7 @@ if ($companynamestore != "") {
         )");
 
         $cono->query("CREATE TABLE Product (
-            ProductID INT IDENTITY(1,1) PRIMARY KEY,
+            ProductID INT PRIMARY KEY,
             CategoryID INT,
             WarehouseID INT,
             Name VARCHAR(255) NOT NULL,
@@ -227,7 +227,7 @@ if ($companynamestore != "") {
         )");
 
         $cono->query("CREATE TABLE [Transaction] (
-            TransactionID INT IDENTITY(1,1) PRIMARY KEY,
+            TransactionID INT PRIMARY KEY,
             WarehouseID INT,
             CustomerID INT,
             TransactionType VARCHAR(50),
@@ -238,7 +238,7 @@ if ($companynamestore != "") {
         )");
 
         $cono->query("CREATE TABLE TransactionDetail (
-            TransactionDetailID INT IDENTITY(1,1) PRIMARY KEY,
+            TransactionDetailID INT PRIMARY KEY,
             TransactionID INT,
             ProductID INT,
             Quantity INT,
