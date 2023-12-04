@@ -2,17 +2,17 @@
 session_start();
 
 $companyid = 1;
-    $newusername = validateName($_POST['username']);
-    $password = validatePassword($_POST['password']);
-    $email = validateEmail($_POST['email']);
-    $phone = validatePhone($_POST['phone']);
-    $firstname = validateInput($_POST['firstName']);
-    $lastname = validateInput($_POST['lastName']);
-    $currentDateTime = date('Y-m-d H:i:s');
-    $userrole = validateInput($_POST['userrole']);
-    $status = "Active";
+$newusername = validateName($_POST['username']);
+$password = validatePassword($_POST['password']);
+$email = validateEmail($_POST['email']);
+$phone = validatePhone($_POST['phone']);
+$firstname = validateInput($_POST['firstName']);
+$lastname = validateInput($_POST['lastName']);
+$currentDateTime = date('Y-m-d H:i:s');
+$userrole = validateInput($_POST['userrole']);
+$status = "Active";
 
-    $companyname = $_SESSION['companyname'];
+$companyname = $_SESSION['companyname'];
 
 function validateInput($data)
 {
@@ -116,10 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newUserID = $row['max_id'] + 1;
 
     // Create user
-    $sql = "INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
-            VALUES (:newUserID, :companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
+    $sql = "INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
+        VALUES (:companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':newUserID', $newUserID);
     $stmt->bindParam(':companyid', $companyid);
     $stmt->bindParam(':newusername', $newusername);
     $stmt->bindParam(':password', $password);
@@ -130,20 +129,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':UserStatus', $status);
     $stmt->bindParam(':userrole', $userrole);
 
+
     try {
         $conn->beginTransaction();
         $stmt->execute();
 
         // Check the connection
         try {
-        $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
-        $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+            $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-        // Log the error to a file for debugging purposes
-        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-        // Display a user-friendly message
-        echo "Connection failed. Please try again later.";
-        exit();
+            // Log the error to a file for debugging purposes
+            error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+            // Display a user-friendly message
+            echo "Connection failed. Please try again later.";
+            exit();
         }
 
         // Create user in the new connection

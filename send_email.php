@@ -7,55 +7,58 @@ require 'phpmailer/src/Exception.php';
 require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/SMTP.php';
 
-// Assuming you have already established a database connection
 session_start(); // Start the session at the beginning of the script
 
 $username = $_POST['username'];
 $companyName = $_POST['companyName'];
 
 try {
-    $checkvalidcompany = new PDO(
+    $connn = new PDO(
         "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
         "sqladmin",
-        "#Allhere",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+        "#Allhere"
     );
 
     // Use prepared statements to prevent SQL injection
-    $checkvalidcompanyquery = "SELECT CompanyName FROM [user] WHERE CompanyName = :companyName";
-    $stmt = $checkvalidcompany->prepare($checkvalidcompanyquery);
-    $stmt->bindParam(':companyName', $companyName);
-    $stmt->execute();
+    $sqlq = "SELECT CompanyName FROM [user] WHERE UserID = :username";
+    $stmt = $connn->prepare($sqlq);
+    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+    $stmt->execute(); // Execute the query
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($row) {
-        $_SESSION['error_message'] = "Company does not exist";
-        header("Location: forgetpassword.php");
-        exit;
+    if (!$row || empty($row['CompanyName'])) {
+    $_SESSION['error_message'] = "Company does not exist";
+    header("Location: forgetpassword.php");
+    exit;
     }
+
+
 } catch (PDOException $e) {
-    die("Error checking company existence: " . $e->getMessage());
+    $_SESSION['error_message'] = "Error checking company existence: " . $e->getMessage();
+    header("Location: forgetpassword.php");
+    exit;
 }
+
+
 
 try {
     $conn = new PDO(
-        "sqlsrv:server = tcp:allhereserver.database.windows.net,1433;Database=$companyName",
+        "sqlsrv:server = tcp:yourserver.database.windows.net,1433;Database=$companyName",
         "sqladmin",
-        "#Allhere",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+        "#Allhere"
     );
 
     // Use prepared statements to prevent SQL injection
-    $query = "SELECT Email, Password FROM [user] WHERE username = :username";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':username', $username);
-    $stmt->execute();
+    $query = "SELECT Email, Password FROM [user] WHERE Username = :username";
+    $stmte = $conn->prepare($query);
+    $stmte->bindParam(':username', $username);
+    $stmte->execute();
 
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $rows = $stmte->fetch(PDO::FETCH_ASSOC);
 
-    if ($row) {
-        $password = $row['password'];
-        $email = $row['email'];
+    if ($rows) {
+        $email = $rows['Email'];
+        $password = $rows['Password'];
 
         // Send email using PHPMailer
         $mail = new PHPMailer(true);
@@ -65,13 +68,13 @@ try {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP server
         $mail->SMTPAuth = true;
-        $mail->Username = 'allherewebapp@gmail.com'; // Replace with your SMTP username
-        $mail->Password = 'pplcxcrsocwxnkpx'; // Replace with your SMTP password
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
+        $mail->Username = 'tongkf-wm20@student.tarc.edu.my'; // Replace with your SMTP username
+        $mail->Password = 'grng mjer qrmm ngcd'; // Replace with your SMTP password
+        $mail->SMTPSecure = 'tls'; // Use TLS instead of SSL
+        $mail->Port = 587; // Azure uses port 587 for TLS
 
         // Recipients
-        $mail->setFrom('allherewebapp@gmail.com', 'All Here');
+        $mail->setFrom('tongkf-wm20@student.tarc.edu.my', 'All Here');
         $mail->addAddress($email); // Add recipient
 
         // Content
@@ -88,11 +91,8 @@ try {
         exit;
     }
 } catch (Exception $e) {
-    $_SESSION['error_message'] = "Failed to send email. Error: {$mail->ErrorInfo}";
+    $_SESSION['error_message'] = "Failed to send email. Error: {$e->getMessage()}";
     header("Location: forgetpassword.php");
     exit;
-} finally {
-    // Close the database connection
-    $conn = null;
 }
 ?>

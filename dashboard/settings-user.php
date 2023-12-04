@@ -4,6 +4,24 @@ $pageTitle = "Settings/Users";
 include '../database/database-connect.php';
 include '../contain/header.php';
 
+// Replace these values with your Azure SQL Database connection details
+$serverName = "tcp:allhereserver.database.windows.net,1433";
+$database = $companyname;
+$uid = "sqladmin";
+$pwd = "#Allhere";
+
+// Check the connection
+try {
+    $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    // Log the error to a file for debugging purposes
+    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+    // Display a user-friendly message
+    echo "Connection failed. Please try again later.";
+    exit();
+}
+
 try {
     // Fetch all users
     $sqlAllUsers = "SELECT * FROM [User]";
@@ -11,53 +29,48 @@ try {
     $stmtAllUsers->execute();
     $allUsers = $stmtAllUsers->fetchAll(PDO::FETCH_ASSOC);
 
-    // Delete user logic
-    if (isset($_POST['deleteUser'])) {
-        $userIDToDelete = $_POST['deleteUser'];
-
-        // Get the username of the user to be deleted
-        $sqlGetUsername = "SELECT Username FROM [User] WHERE UserID = ?";
-        $stmtGetUsername = $conn->prepare($sqlGetUsername);
-        $stmtGetUsername->bindParam(1, $userIDToDelete, PDO::PARAM_INT);
-        $stmtGetUsername->execute();
-        $usernameToDelete = $stmtGetUsername->fetchColumn();
-
-        // Create a new connection for the other database
-        $connn = new PDO('mysql:host=localhost;dbname=adminallhere', 'root', '');
-
-        // Use a prepared statement to prevent SQL injection
-        $sqlDeleteOtherTable = "DELETE FROM [user] WHERE UserID = ?";
-        $stmtDeleteOtherTable = $connn->prepare($sqlDeleteOtherTable);
-        $stmtDeleteOtherTable->bindParam(1, $usernameToDelete, PDO::PARAM_STR);
-        $stmtDeleteOtherTable->execute();
-
-        // Check for errors
-        if ($stmtDeleteOtherTable->errorCode() !== '00000') {
-            $errorInfo = $stmtDeleteOtherTable->errorInfo();
-            echo "Error deleting from other table: " . $errorInfo[2];
-            exit();
-        }
-
-        // Perform the deletion in the main user table
-        $sqlDeleteUser = "DELETE FROM [User] WHERE UserID = ?";
-        $stmtDeleteUser = $conn->prepare($sqlDeleteUser);
-        $stmtDeleteUser->bindParam(1, $userIDToDelete, PDO::PARAM_INT);
-        $stmtDeleteUser->execute();
-
-        // Check for errors
-        if ($stmtDeleteUser->errorCode() !== '00000') {
-            $errorInfo = $stmtDeleteUser->errorInfo();
-            echo "Error deleting user: " . $errorInfo[2];
-            exit();
-        }
-
-        // Redirect to the same page to refresh the user list
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }
 } catch (PDOException $e) {
     // Handle database errors
     echo "Error: " . $e->getMessage();
+    exit();
+}
+
+// Delete user logic
+if (isset($_POST['deleteUser'])) {
+    $userIDToDelete = $_POST['deleteUser'];
+
+    try {
+        $connn = new PDO("sqlsrv:server=$serverName;Database=allheredb", $uid, $pwd);
+        $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        // Log the error to a file for debugging purposes
+        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+        // Display a user-friendly message
+        echo "Connection failed. Please try again later.";
+        exit();
+    }
+
+    // Get the username of the user to be deleted
+    $sqlGetUsername = "SELECT Username FROM [User] WHERE UserID = ?";
+    $stmtGetUsername = $conn->prepare($sqlGetUsername);
+    $stmtGetUsername->bindParam(1, $userIDToDelete, PDO::PARAM_INT);
+    $stmtGetUsername->execute();
+    $usernameToDelete = $stmtGetUsername->fetchColumn();
+
+    // Use a prepared statement to prevent SQL injection
+    $sqlDeleteOtherTable = "DELETE FROM [user] WHERE UserID = ?";
+    $stmtDeleteOtherTable = $connn->prepare($sqlDeleteOtherTable);
+    $stmtDeleteOtherTable->bindParam(1, $usernameToDelete, PDO::PARAM_STR);
+    $stmtDeleteOtherTable->execute();
+
+    // Perform the deletion in the main user table
+    $sqlDeleteUser = "DELETE FROM [User] WHERE UserID = ?";
+    $stmtDeleteUser = $conn->prepare($sqlDeleteUser);
+    $stmtDeleteUser->bindParam(1, $userIDToDelete, PDO::PARAM_INT);
+    $stmtDeleteUser->execute();
+
+    // Redirect to the same page to refresh the user list
+    header("Location: settings-user.php");
     exit();
 }
 
