@@ -2,7 +2,6 @@
 
 session_start();
 
-$companyid = '1';
 $companyname = validateName($_POST['company_name']);
 $companyemail = validateEmail($_POST['company_email']);
 $companyphone = validatePhone($_POST['company_phone_number']);
@@ -163,7 +162,7 @@ if ($companynamestore != "") {
 
         // Create tables
         $cono->query("CREATE TABLE Company (
-            CompanyID INT PRIMARY KEY,
+            CompanyID INT IDENTITY(1,1) PRIMARY KEY,
             CompanyName VARCHAR(255) NOT NULL,
             Email VARCHAR(255),
             Phone VARCHAR(20),
@@ -171,7 +170,7 @@ if ($companynamestore != "") {
         )");
 
         // Insert values into Company table
-        $cono->query("INSERT INTO Company (CompanyID, CompanyName, Email, Phone, Address) VALUES ('$companyid', '$companyname', '$companyemail', '$companyphone', '$companyaddress')");
+        $cono->query("INSERT INTO Company (CompanyName, Email, Phone, Address) VALUES ('$companyname', '$companyemail', '$companyphone', '$companyaddress')");
 
         $cono->query("CREATE TABLE [User] (
             UserID INT IDENTITY(1,1) PRIMARY KEY,
@@ -188,7 +187,7 @@ if ($companynamestore != "") {
             FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
         )");
 
-        $cono->query("INSERT INTO [User] (UserID, CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , '$status')");
+        $cono->query("INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , '$status')");
 
         $cono->query("CREATE TABLE Category (
             CategoryID INT IDENTITY(1,1) PRIMARY KEY,
