@@ -171,9 +171,6 @@ if ($companynamestore != "") {
 
         // Insert values into Company table
         $cono->query("INSERT INTO Company (CompanyName, Email, Phone, Address) VALUES ('$companyname', '$companyemail', '$companyphone', '$companyaddress')");
-        
-        // Retrieve the generated CompanyID
-        $companyID = $cono->lastInsertId();
 
         $cono->query("CREATE TABLE [User] (
             UserID INT IDENTITY(1,1) PRIMARY KEY,
@@ -190,7 +187,7 @@ if ($companynamestore != "") {
             FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
         )");
 
-        $cono->query("INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('$companyid', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , '$status')");
+        $cono->query("INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserRole, LastLoginDate, UserStatus) VALUES ('1', '$username', '$password', '$email', '$phone', '$firstname', '$lastname', 'Admin', SYSDATETIME() , '$status')");
 
         $cono->query("CREATE TABLE Category (
             CategoryID INT IDENTITY(1,1) PRIMARY KEY,
