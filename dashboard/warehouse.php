@@ -100,6 +100,9 @@ if (isset($_POST['deleteWarehouse'])) {
                                     <?= $warehouse['Contact'] ?>
                                 </td>
                                 <td>
+                                    <?= $warehouse['Email'] ?>
+                                </td>
+                                <td>
                                     <?= $warehouse['Action'] ?>
                                 </td>
                                 <td>
