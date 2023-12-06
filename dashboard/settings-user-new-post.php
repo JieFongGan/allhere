@@ -75,26 +75,44 @@ function validatePassword($password)
     }
 }
 
-
 //Create user data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     // Replace these values with your Azure SQL Database connection details
     $serverName = "tcp:allhereserver.database.windows.net,1433";
     $database = $companyname;
     $uid = "sqladmin";
     $pwd = "#Allhere";
-
-    // Check the connection
+    
     try {
-        $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
-        $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Check the connection
+        try {
+            $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+            $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            // Log the error to a file for debugging purposes
+            error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+            // Display a user-friendly message
+            echo "Connection failed. Please try again later.";
+            exit();
+        }
+
+        // Check if username already exists
+        $sql = "SELECT * FROM [user] WHERE Username = :newusername";
+        $stmt = $connn->prepare($sql);
+        $stmt->bindParam(':newusername', $newusername);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $_SESSION['error_message'] = "Username already exists";
+            header("Location: settings-user-new.php");
+            exit;
+        }
     } catch (PDOException $e) {
-        // Log the error to a file for debugging purposes
-        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-        // Display a user-friendly message
-        echo "Connection failed. Please try again later.";
-        exit();
+        $conn->rollBack();
+        echo "Error creating user: " . $e->getMessage();
     }
+
 
     // Check the connection
     try {
@@ -108,76 +126,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+
+    // Check if username already exists
     $sql = "SELECT * FROM [user] WHERE Username = :newusername";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':newusername', $newusername);
     $stmt->execute();
 
-    $user = $stmt->fetch();
-
-    if ($user) {
+    if ($stmt->rowCount() > 0) {
         $_SESSION['error_message'] = "Username already exists";
         header("Location: settings-user-new.php");
         exit;
-    }
+    }else{
 
+    // Get the biggest UserID and increment it by 1
+    $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $newUserID = $row['max_id'] + 1;
 
-    $sql = "SELECT * FROM [user] WHERE Username = :newusername";
-    $stmt = $connn->prepare($sql);
+    // Create user
+    $sql = "INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
+        VALUES (:companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':companyid', $companyid);
     $stmt->bindParam(':newusername', $newusername);
+    $stmt->bindParam(':password', $password);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':phone', $phone);
+    $stmt->bindParam(':firstname', $firstname);
+    $stmt->bindParam(':lastname', $lastname);
+    $stmt->bindParam(':UserStatus', $status);
+    $stmt->bindParam(':userrole', $userrole);
+
+    $conn->beginTransaction();
     $stmt->execute();
 
-    $user = $stmt->fetch();
+     // Create user in the new connection
+     $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
+     $stmt = $connn->prepare($sql);
+     $stmt->bindParam(':newusername', $newusername);
+     $stmt->bindParam(':companyname', $companyname);
 
-    if ($user) {
-        $_SESSION['error_message'] = "Username already exists in other company";
-        header("Location: settings-user-new.php");
-        exit;
-    } else {
+     $stmt->execute();
 
-        // Get the biggest UserID and increment it by 1
-        $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $newUserID = $row['max_id'] + 1;
+     $connn->commit();
 
-        // Create user
-        $sql = "INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
-        VALUES (:companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':companyid', $companyid);
-        $stmt->bindParam(':newusername', $newusername);
-        $stmt->bindParam(':password', $password);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
-        $stmt->bindParam(':firstname', $firstname);
-        $stmt->bindParam(':lastname', $lastname);
-        $stmt->bindParam(':UserStatus', $status);
-        $stmt->bindParam(':userrole', $userrole);
+     // Redirect back to the previous page or perform any other action
+     header('Location: settings-user.php');
+     exit;
 
-
-        try {
-            $conn->beginTransaction();
-            $stmt->execute();
-
-            // Create user in the new connection
-            $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
-            $stmt = $connn->prepare($sql);
-            $stmt->bindParam(':newusername', $newusername);
-            $stmt->bindParam(':companyname', $companyname);
-
-            $stmt->execute();
-
-            $conn->commit();
-
-            // Redirect back to the previous page or perform any other action
-            header('Location: settings-user.php');
-            exit;
-        } catch (PDOException $e) {
-            $conn->rollBack();
-            echo "Error creating user: " . $e->getMessage();
-        }
     }
+
+   
 }
 ?>
