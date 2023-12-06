@@ -7,7 +7,7 @@ require 'phpmailer/src/Exception.php';
 require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/SMTP.php';
 
-session_start(); // Start the session at the beginning of the script
+session_start();
 
 $username = $_POST['username'];
 $companyName = $_POST['companyName'];
@@ -68,13 +68,13 @@ try {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP server
         $mail->SMTPAuth = true;
-        $mail->Username = 'tongkf-wm20@student.tarc.edu.my'; // Replace with your SMTP username
-        $mail->Password = 'grng mjer qrmm ngcd'; // Replace with your SMTP password
+        $mail->Username = 'koroxermarxus@gmail.com'; // Replace with your SMTP username
+        $mail->Password = 'jnya qbeg ppgk fphd'; // Replace with your SMTP password
         $mail->SMTPSecure = 'tls'; // Use TLS instead of SSL
         $mail->Port = 587; // Azure uses port 587 for TLS
 
         // Recipients
-        $mail->setFrom('tongkf-wm20@student.tarc.edu.my', 'All Here');
+        $mail->setFrom('koroxermarxus@gmail.com', 'All Here');
         $mail->addAddress($email); // Add recipient
 
         // Content
