@@ -13,15 +13,15 @@ $username = $_POST['username'];
 $companyName = $_POST['companyName'];
 
 try {
-    $connn = new PDO(
+    $connect = new PDO(
         "sqlsrv:server = tcp:allhereserver.database.windows.net,1433; Database = allheredb",
         "sqladmin",
         "#Allhere"
     );
 
     // Use prepared statements to prevent SQL injection
-    $sqlq = "SELECT CompanyName FROM [user] WHERE UserID = :username";
-    $stmt = $connn->prepare($sqlq);
+    $sql = "SELECT CompanyName FROM [user] WHERE UserID = :username";
+    $stmt = $connect->prepare($sql);
     $stmt->bindParam(':username', $username, PDO::PARAM_STR);
     $stmt->execute(); // Execute the query
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
