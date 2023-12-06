@@ -1,4 +1,9 @@
 <?php
+if (isset($_SESSION['companyname'])) {
+unset($_SESSION['companyname']);
+unset($_SESSION['username']);
+unset($_SESSION['userrole']);
+} 
 
 session_start();
 
