@@ -75,6 +75,58 @@ function validatePassword($password)
     }
 }
 
+// Check the connection
+try {
+    $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+    $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    // Log the error to a file for debugging purposes
+    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+    // Display a user-friendly message
+    echo "Connection failed. Please try again later.";
+    exit();
+}
+
+// Check the connection
+try {
+    $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    // Log the error to a file for debugging purposes
+    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+    // Display a user-friendly message
+    echo "Connection failed. Please try again later.";
+    exit();
+}
+
+$sql = "SELECT * FROM [user] WHERE Username = :newusername";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':newusername', $newusername);
+$stmt->execute();
+
+$user = $stmt->fetch();
+
+if ($user) {
+    $_SESSION['error_message'] = "Username already exists";
+    header("Location: settings-user-new.php");
+    exit;
+}
+
+
+$sql = "SELECT * FROM [user] WHERE Username = :newusername";
+$stmt = $connn->prepare($sql);
+$stmt->bindParam(':newusername', $newusername);
+$stmt->execute();
+
+$user = $stmt->fetch();
+
+if ($user) {
+    $_SESSION['error_message'] = "Username already exists in other company";
+    header("Location: settings-user-new.php");
+    exit;
+}
+
+
 //Create user data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Replace these values with your Azure SQL Database connection details
@@ -82,31 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $database = $companyname;
     $uid = "sqladmin";
     $pwd = "#Allhere";
-
-    // Check the connection
-    try {
-        $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        // Log the error to a file for debugging purposes
-        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-        // Display a user-friendly message
-        echo "Connection failed. Please try again later.";
-        exit();
-    }
-
-
-    // Check if username already exists
-    $sql = "SELECT * FROM [user] WHERE Username = :newusername";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':newusername', $newusername);
-    $stmt->execute();
-
-    if ($stmt->rowCount() > 0) {
-        $_SESSION['error_message'] = "Username already exists";
-        header("Location: settings-user-new.php");
-        exit;
-    }
 
     // Get the biggest UserID and increment it by 1
     $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
@@ -133,18 +160,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->beginTransaction();
         $stmt->execute();
-
-        // Check the connection
-        try {
-            $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
-            $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            // Log the error to a file for debugging purposes
-            error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-            // Display a user-friendly message
-            echo "Connection failed. Please try again later.";
-            exit();
-        }
 
         // Create user in the new connection
         $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
