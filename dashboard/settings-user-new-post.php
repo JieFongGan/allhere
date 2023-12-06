@@ -9,7 +9,7 @@ $phone = validatePhone($_POST['phone']);
 $firstname = validateInput($_POST['firstName']);
 $lastname = validateInput($_POST['lastName']);
 $currentDateTime = date('Y-m-d H:i:s');
-$userrole = validateInput($_POST['userrole']);
+$userroles = validateInput($_POST['userrole']);
 $status = "Active";
 
 $companyname = $_SESSION['companyname'];
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':firstname', $firstname);
     $stmt->bindParam(':lastname', $lastname);
     $stmt->bindParam(':UserStatus', $status);
-    $stmt->bindParam(':userrole', $userrole);
+    $stmt->bindParam(':userrole', $userroles);
 
 
     try {
