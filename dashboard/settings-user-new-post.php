@@ -75,57 +75,6 @@ function validatePassword($password)
     }
 }
 
-// Check the connection
-try {
-    $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
-    $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    // Log the error to a file for debugging purposes
-    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-    // Display a user-friendly message
-    echo "Connection failed. Please try again later.";
-    exit();
-}
-
-// Check the connection
-try {
-    $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    // Log the error to a file for debugging purposes
-    error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
-    // Display a user-friendly message
-    echo "Connection failed. Please try again later.";
-    exit();
-}
-
-$sql = "SELECT * FROM [user] WHERE Username = :newusername";
-$stmt = $conn->prepare($sql);
-$stmt->bindParam(':newusername', $newusername);
-$stmt->execute();
-
-$user = $stmt->fetch();
-
-if ($user) {
-    $_SESSION['error_message'] = "Username already exists";
-    header("Location: settings-user-new.php");
-    exit;
-}
-
-
-$sql = "SELECT * FROM [user] WHERE Username = :newusername";
-$stmt = $connn->prepare($sql);
-$stmt->bindParam(':newusername', $newusername);
-$stmt->execute();
-
-$user = $stmt->fetch();
-
-if ($user) {
-    $_SESSION['error_message'] = "Username already exists in other company";
-    header("Location: settings-user-new.php");
-    exit;
-}
-
 
 //Create user data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -135,48 +84,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $uid = "sqladmin";
     $pwd = "#Allhere";
 
-    // Get the biggest UserID and increment it by 1
-    $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    $newUserID = $row['max_id'] + 1;
-
-    // Create user
-    $sql = "INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
-        VALUES (:companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':companyid', $companyid);
-    $stmt->bindParam(':newusername', $newusername);
-    $stmt->bindParam(':password', $password);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':phone', $phone);
-    $stmt->bindParam(':firstname', $firstname);
-    $stmt->bindParam(':lastname', $lastname);
-    $stmt->bindParam(':UserStatus', $status);
-    $stmt->bindParam(':userrole', $userrole);
-
-
+    // Check the connection
     try {
-        $conn->beginTransaction();
-        $stmt->execute();
-
-        // Create user in the new connection
-        $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
-        $stmt = $connn->prepare($sql);
-        $stmt->bindParam(':newusername', $newusername);
-        $stmt->bindParam(':companyname', $companyname);
-
-        $stmt->execute();
-
-        $conn->commit();
-
-        // Redirect back to the previous page or perform any other action
-        header('Location: settings-user.php');
-        exit;
+        $connn = new PDO("sqlsrv:server=$serverName;Database = allheredb", $uid, $pwd);
+        $connn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-        $conn->rollBack();
-        echo "Error creating user: " . $e->getMessage();
+        // Log the error to a file for debugging purposes
+        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+        // Display a user-friendly message
+        echo "Connection failed. Please try again later.";
+        exit();
+    }
+
+    // Check the connection
+    try {
+        $conn = new PDO("sqlsrv:server=$serverName;Database=$database", $uid, $pwd);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        // Log the error to a file for debugging purposes
+        error_log("Connection failed: " . $e->getMessage(), 3, "error.log");
+        // Display a user-friendly message
+        echo "Connection failed. Please try again later.";
+        exit();
+    }
+
+    $sql = "SELECT * FROM [user] WHERE Username = :newusername";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':newusername', $newusername);
+    $stmt->execute();
+
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $_SESSION['error_message'] = "Username already exists";
+        header("Location: settings-user-new.php");
+        exit;
+    }
+
+
+    $sql = "SELECT * FROM [user] WHERE Username = :newusername";
+    $stmt = $connn->prepare($sql);
+    $stmt->bindParam(':newusername', $newusername);
+    $stmt->execute();
+
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $_SESSION['error_message'] = "Username already exists in other company";
+        header("Location: settings-user-new.php");
+        exit;
+    } else {
+
+        // Get the biggest UserID and increment it by 1
+        $sql = "SELECT MAX(UserID) AS max_id FROM [user]";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $newUserID = $row['max_id'] + 1;
+
+        // Create user
+        $sql = "INSERT INTO [User] (CompanyID, Username, Password, Email, Phone, FirstName, LastName, UserStatus, UserRole, LastLoginDate) 
+        VALUES (:companyid, :newusername, :password, :email, :phone, :firstname, :lastname, :UserStatus, :userrole, SYSDATETIME())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':companyid', $companyid);
+        $stmt->bindParam(':newusername', $newusername);
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':firstname', $firstname);
+        $stmt->bindParam(':lastname', $lastname);
+        $stmt->bindParam(':UserStatus', $status);
+        $stmt->bindParam(':userrole', $userrole);
+
+
+        try {
+            $conn->beginTransaction();
+            $stmt->execute();
+
+            // Create user in the new connection
+            $sql = "INSERT INTO [user] (UserID, CompanyName, Status) Values (:newusername, :companyname, 'Active')";
+            $stmt = $connn->prepare($sql);
+            $stmt->bindParam(':newusername', $newusername);
+            $stmt->bindParam(':companyname', $companyname);
+
+            $stmt->execute();
+
+            $conn->commit();
+
+            // Redirect back to the previous page or perform any other action
+            header('Location: settings-user.php');
+            exit;
+        } catch (PDOException $e) {
+            $conn->rollBack();
+            echo "Error creating user: " . $e->getMessage();
+        }
     }
 }
 ?>
