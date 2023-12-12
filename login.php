@@ -264,10 +264,6 @@ try {
                   <button type="reset" class="login-button1 button">Clear</button>
                 </div>
               </form>
-              <div class="login-input-group">
-                <label class="login-label">Forget Password? </label>
-                <a href="forgetpassword.php" class="login-text2" style="color: blue;">Here</a>
-              </div>
               <br>
               <div class="login-input-group">
                 <label class="login-label">Don't have an account? </label>
