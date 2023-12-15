@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" id="authcode" name="authcode" value="<?php echo $_GET['authcode']; ?>" readonly><br><br>
 
             <label for="companyname">Company Name:</label>
-            <input type="text" id="companyname" name="companyname" value="<?php echo $companyName; ?>"><br><br>
+            <input type="text" id="companyname" name="companyname" value="<?php echo $companyName; ?>" readonly><br><br>
 
             <label for="status">Status:</label>
             <select id="status" name="status">
