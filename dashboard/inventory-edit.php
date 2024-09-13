@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="form-group">
                     <label for="productPrice">Price (RM):</label>
-                    <input type="number" id="productPrice" name="productPrice" value="<?= $productData['Price'] ?>"
+                    <input type="number" step="0.01" min="0" id="productPrice" name="productPrice" value="<?= $productData['Price'] ?>"
                         placeholder="Price" oninput="validateNumberInput(this)" required>
                 </div>
                 <div class="form-group">
