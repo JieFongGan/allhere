@@ -1,0 +1,22 @@
+CREATE TABLE admin (
+    AdminID varchar(255) NOT NULL,
+    AdminPassword varchar(255) NOT NULL,
+    PRIMARY KEY (AdminID)  -- Adding a primary key
+);
+
+INSERT INTO admin (AdminID, AdminPassword) VALUES
+('admin', 'admin123');
+
+CREATE TABLE company (
+    CompanyName varchar(255) NOT NULL,
+    Status varchar(255) NOT NULL,
+    AuthCode varchar(7) NOT NULL,
+    PRIMARY KEY (AuthCode)  -- Adding a primary key
+);
+
+CREATE TABLE "user" (
+    UserID varchar(255) NOT NULL,
+    CompanyName varchar(255) NOT NULL,
+    Status varchar(255) NOT NULL,
+    PRIMARY KEY (UserID)  -- Adding a primary key
+);
